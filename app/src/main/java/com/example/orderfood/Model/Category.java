@@ -4,23 +4,25 @@ public class Category {
     private String Name;
     private String Image;
 
-    public String getCategoryId() {
+    public int getCategoryId() {
         return categoryId;
     }
 
-    public void setCategoryId(String categoryId) {
+    public void setCategoryId(int categoryId) {
         this.categoryId = categoryId;
     }
 
-    private String categoryId;
+    private int categoryId;
+
 
     public Category(){
 
     }
 
-    public Category(String name, String image) {
+    public Category(String name, String image,int id ) {
         Name = name;
         Image = image;
+        categoryId=id;
     }
 
     public String getName() {
