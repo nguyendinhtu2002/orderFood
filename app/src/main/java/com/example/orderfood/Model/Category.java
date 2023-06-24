@@ -4,6 +4,16 @@ public class Category {
     private String Name;
     private String Image;
 
+    public String getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(String categoryId) {
+        this.categoryId = categoryId;
+    }
+
+    private String categoryId;
+
     public Category(){
 
     }

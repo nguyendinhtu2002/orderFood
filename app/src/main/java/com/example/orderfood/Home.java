@@ -49,7 +49,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+        implements NavigationView.OnNavigationItemSelectedListener,ItemClickListener {
 
     private RecyclerView recycler_menu;
     private AppBarConfiguration mAppBarConfiguration;
@@ -170,5 +170,16 @@ public class Home extends AppCompatActivity
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    @Override
+    public void onclick(View v, int position, boolean isLongClick) {
+        Toast.makeText(this,"Da click",Toast.LENGTH_SHORT).show();
+        // Get the clicked category
+        Category clickedCategory = menuList.get(position);
+
+        // Pass the category to the food detail activity
+        Intent foodDetailIntent = new Intent(Home.this, FoodDetail.class);
+        foodDetailIntent.putExtra("CategoryId", clickedCategory.getCategoryId());
+        startActivity(foodDetailIntent);
     }
 }
