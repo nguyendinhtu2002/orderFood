@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.orderfood.Database.FoodDatabase;
+import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.FoodDetail;
 import com.example.orderfood.Interface.ItemClickListener;
 import com.example.orderfood.Model.Food;
@@ -23,13 +23,17 @@ import java.util.List;
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
     private List<Food> foodList;
     private Context context;
-    private FoodDatabase foodDatabase;
-    Food food = new Food();
+    private MyDataBase foodDatabase;
+    private ItemClickListener itemClickListener;
 
     public FoodAdapter(Context context, List<Food> foodList) {
         this.context = context;
         this.foodList = foodList;
-        foodDatabase = new FoodDatabase(context);
+        foodDatabase = new MyDataBase(context);
+    }
+
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 
     @NonNull
@@ -41,19 +45,19 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
-        String foodName = food.getName();
-
         final Food food = foodList.get(position);
+
+        String foodName = food.getName();
         holder.food_name.setText(foodName);
         Picasso.get().load(food.getImage()).into(holder.food_image);
-        holder.setItemClickListener(new ItemClickListener() {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onclick(View v, int position, boolean isLongClick) {
-                // Do something when item is clicked
-                // For example, navigate to food detail activity
-                Intent foodDetail = new Intent(context, FoodDetail.class);
-                foodDetail.putExtra("FoodId", food.getMenuId());
-                context.startActivity(foodDetail);
+            public void onClick(View v) {
+                if (itemClickListener != null) {
+                    int clickedPosition = holder.getAdapterPosition();
+                    itemClickListener.onclick(v, clickedPosition, false);
+                }
             }
         });
 
@@ -66,25 +70,14 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         return foodList.size();
     }
 
-    public static class FoodViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class FoodViewHolder extends RecyclerView.ViewHolder {
         TextView food_name;
         ImageView food_image;
-        private ItemClickListener itemClickListener;
 
         public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
             food_name = itemView.findViewById(R.id.food_name);
             food_image = itemView.findViewById(R.id.food_image);
-            itemView.setOnClickListener(this);
-        }
-
-        public void setItemClickListener(ItemClickListener itemClickListener) {
-            this.itemClickListener = itemClickListener;
-        }
-
-        @Override
-        public void onClick(View v) {
-            itemClickListener.onclick(v, getAdapterPosition(), false);
         }
     }
 }

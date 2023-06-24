@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.example.orderfood.Database.Database;
-import com.example.orderfood.Database.FoodDatabase;
 import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Model.Food;
 import com.example.orderfood.Model.Order;

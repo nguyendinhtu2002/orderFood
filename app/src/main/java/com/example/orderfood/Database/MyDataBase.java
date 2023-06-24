@@ -5,6 +5,7 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
 
 import com.example.orderfood.Model.Category;
 import com.example.orderfood.Model.Food;
@@ -219,7 +220,7 @@ public class MyDataBase extends SQLiteOpenHelper {
                 String price = cursor.getString(cursor.getColumnIndex(COL_PRICE));
                 String discount = cursor.getString(cursor.getColumnIndex(COL_DISCOUNT));
                 String menuId = cursor.getString(cursor.getColumnIndex(COL_MENU_ID));
-                Food food = new Food(name, image, description, price, discount, menuId);
+                Food food = new Food(id,name, image, description, price, discount, menuId);
                 foodList.add(food);
             } while (cursor.moveToNext());
         }
@@ -235,13 +236,17 @@ public class MyDataBase extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_FOODS, projection, selection, selectionArgs, null, null, null);
         Food food = null;
         if (cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndex(COL_ID));
+
             String name = cursor.getString(cursor.getColumnIndex(COL_FOOD_NAME));
             String image = cursor.getString(cursor.getColumnIndex(COL_IMAGE));
             String description = cursor.getString(cursor.getColumnIndex(COL_DESCRIPTION));
             String price = cursor.getString(cursor.getColumnIndex(COL_PRICE));
             String discount = cursor.getString(cursor.getColumnIndex(COL_DISCOUNT));
             String menuId = cursor.getString(cursor.getColumnIndex(COL_MENU_ID));
-            food = new Food(name, image, description, price, discount, menuId);
+            Log.d("FoodId", String.valueOf(id));
+
+            food = new Food(id,name, image, description, price, discount, menuId);
         }
         cursor.close();
         db.close();
@@ -263,7 +268,7 @@ public class MyDataBase extends SQLiteOpenHelper {
                 String price = cursor.getString(cursor.getColumnIndex(COL_PRICE));
                 String discount = cursor.getString(cursor.getColumnIndex(COL_DISCOUNT));
                 String menuId = cursor.getString(cursor.getColumnIndex(COL_MENU_ID));
-                Food food = new Food(name, image, description, price, discount, menuId);
+                Food food = new Food(id,name, image, description, price, discount, menuId);
                 foodList.add(food);
             } while (cursor.moveToNext());
         }

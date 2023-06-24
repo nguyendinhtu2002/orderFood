@@ -2,11 +2,21 @@ package com.example.orderfood.Model;
 
 public class Food {
     private String Name, Image, Description, Price, Discount, MenuId;
+    private int ID;
+
+    public int getId() {
+        return ID;
+    }
+
+    public void setId(int id) {
+        this.ID = id;
+    }
 
     public Food() {
     }
 
-    public Food(String name, String image, String description, String price, String discount, String menuId) {
+    public Food(int id, String name, String image, String description, String price, String discount, String menuId) {
+        ID = id;
         Name = name;
         Image = image;
         Description = description;
