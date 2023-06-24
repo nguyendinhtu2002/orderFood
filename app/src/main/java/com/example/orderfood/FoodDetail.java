@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.example.orderfood.Database.Database;
-import com.example.orderfood.Database.FoodDatabase;
 import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Model.Food;
 import com.example.orderfood.Model.Order;
@@ -67,6 +66,7 @@ public class FoodDetail extends AppCompatActivity {
             foodId = getIntent().getStringExtra("FoodId");
 
             if (foodId != null && !foodId.isEmpty()) {
+                Log.d("FoodId", foodId);
                 getDetailFood(foodId);
             } else {
                 Toast.makeText(this,"Khong co gi",Toast.LENGTH_SHORT).show();

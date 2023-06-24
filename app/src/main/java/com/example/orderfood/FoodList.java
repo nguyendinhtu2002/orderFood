@@ -8,13 +8,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.orderfood.Adapter.FoodAdapter;
-import com.example.orderfood.Database.FoodDatabase;
 import com.example.orderfood.Database.MyDataBase;
-import com.example.orderfood.Database.UserDatabase;
 import com.example.orderfood.Interface.ItemClickListener;
+import com.example.orderfood.Model.Category;
 import com.example.orderfood.Model.Food;
 import com.example.orderfood.Model.User;
 import com.example.orderfood.ViewHolder.FoodViewHolder;
@@ -69,6 +69,16 @@ public class FoodList extends AppCompatActivity {
         }
 
     }
+//    @Override
+//    public void onclick(View v, int position, boolean isLongClick) {
+//        // Get the clicked category
+//
+//        Category clickedCategory = menuList.get(position);
+//        // Pass the category to the food detail activity
+//        Intent intent = new Intent(Home.this, FoodList.class);
+//        intent.putExtra("CategoryId", String.valueOf(clickedCategory.getCategoryId()));
+//        startActivity(intent);
+//    }
 
     private void loadFoodListFromFirebase(String categoryId) {
         FirebaseDatabase database = FirebaseDatabase.getInstance();

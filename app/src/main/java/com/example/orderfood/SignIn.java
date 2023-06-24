@@ -12,7 +12,6 @@ import android.widget.Toast;
 
 import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.MyDataBase;
-import com.example.orderfood.Database.UserDatabase;
 import com.example.orderfood.Model.User;
 
 public class SignIn extends AppCompatActivity {
