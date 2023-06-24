@@ -1,6 +1,7 @@
 package com.example.orderfood.Model;
 
 public class Order {
+    private String Id;
     private String ProductId;
     private String ProductName;
     private String Quantity;
@@ -8,6 +9,15 @@ public class Order {
     private String Discount;
 
     public Order() {
+    }
+
+    public Order(String id,String productId, String productName, String quantity, String price, String discount) {
+        Id=id;
+        ProductId = productId;
+        ProductName = productName;
+        Quantity = quantity;
+        Price = price;
+        Discount = discount;
     }
 
     public Order(String productId, String productName, String quantity, String price, String discount) {

@@ -33,6 +33,7 @@ public class Database extends SQLiteAssetHelper {
         if(c.moveToFirst()){
             do{
                 result.add(new Order(
+                        c.getString(c.getColumnIndex("Id")),
                         c.getString(c.getColumnIndex("ProductId")),
                         c.getString(c.getColumnIndex("ProductName")),
                         c.getString(c.getColumnIndex("Quantity")),

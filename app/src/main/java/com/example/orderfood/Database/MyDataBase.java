@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.example.orderfood.Model.Category;
 import com.example.orderfood.Model.Food;
+import com.example.orderfood.Model.Order;
 import com.example.orderfood.Model.User;
 
 import java.util.ArrayList;
@@ -20,6 +21,7 @@ public class MyDataBase extends SQLiteOpenHelper {
     private static final String TABLE_USERS = "Users";
     private static final String TABLE_FOODS = "Foods";
     private static final String TABLE_CATEGORY = "Categories";
+    private static final String TABLE_ORDER = "OrderDetail";
 
     // Columns for the Users table
     private static final String COL_Phone = "Phone";
@@ -36,9 +38,21 @@ public class MyDataBase extends SQLiteOpenHelper {
     private static final String COL_DISCOUNT = "Discount";
     private static final String COL_MENU_ID = "MenuId";
 
+
+    // Columns for the Category table
     private static final String COLUMN_CATEGORY_ID = "id";
     private static final String COLUMN_CATEGORY_NAME = "name";
     private static final String COLUMN_CATEGORY_IMAGE = "image";
+
+    //Column for the Order table
+    private static final String COLUMN_ORDER_ID = "Id";
+    private static final String COLUMN_ORDER_PRODUCT_ID = "ProductId";
+    private static final String COLUMN_ORDER_PRODUCT_NAME = "ProductName";
+    private static final String COLUMN_ORDER_QUANTITY = "Quantity";
+    private static final String COLUMN_ORDER_PRICE = "Price";
+    private static final String COLUMN_ORDER_DISCOUNT = "Discount";
+
+
     public MyDataBase(Context context) {
         super(context, DB_NAME, null, DB_VER);
     }
@@ -71,6 +85,16 @@ public class MyDataBase extends SQLiteOpenHelper {
                 COLUMN_CATEGORY_IMAGE + " TEXT" +
                 ")";
         db.execSQL(CREATE_CATEGORY_TABLE);
+
+        String CREATE_ORDER_TABLE = "CREATE TABLE " + TABLE_ORDER +
+                "(" +
+                COLUMN_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_ORDER_PRODUCT_ID + " INTEGER," +
+                COLUMN_ORDER_PRODUCT_NAME + " TEXT," +
+                COLUMN_ORDER_QUANTITY + " INTEGER," +
+                COLUMN_ORDER_PRICE + " INTEGER," +
+                COLUMN_ORDER_DISCOUNT + " INTEGER" +
+                ")";
     }
 
     @Override
@@ -78,7 +102,7 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOODS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
-
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
         onCreate(db);
     }
     public void addUser(User user) {
@@ -100,6 +124,29 @@ public class MyDataBase extends SQLiteOpenHelper {
         values.put(COLUMN_CATEGORY_NAME, category.getName());
         values.put(COLUMN_CATEGORY_IMAGE, category.getImage());
         db.insert(TABLE_CATEGORY, null, values);
+        db.close();
+    }
+    public void addFood(Food food) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_FOOD_NAME, food.getName());
+        values.put(COL_IMAGE, food.getImage());
+        values.put(COL_DESCRIPTION, food.getDescription());
+        values.put(COL_PRICE, food.getPrice());
+        values.put(COL_DISCOUNT, food.getDiscount());
+        values.put(COL_MENU_ID, food.getMenuId());
+        db.insert(TABLE_FOODS, null, values);
+        db.close();
+    }
+    public void addToCart(Order order) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_ORDER_PRODUCT_ID, order.getProductId());
+        values.put(COLUMN_ORDER_PRODUCT_NAME, order.getProductName());
+        values.put(COLUMN_ORDER_QUANTITY, order.getQuantity());
+        values.put(COLUMN_ORDER_PRICE, order.getPrice());
+        values.put(COLUMN_ORDER_DISCOUNT, order.getDiscount());
+        db.insert(TABLE_ORDER, null, values);
         db.close();
     }
     public List<Category> getAllCategories() {
@@ -135,6 +182,26 @@ public class MyDataBase extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return category;
+    }
+    public Order getOrderById(String orderId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] projection = {COLUMN_ORDER_ID, COLUMN_ORDER_PRODUCT_ID, COLUMN_ORDER_PRODUCT_NAME, COLUMN_ORDER_QUANTITY, COLUMN_ORDER_PRICE, COLUMN_ORDER_DISCOUNT};
+        String selection = COLUMN_ORDER_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(orderId)};
+        Cursor cursor = db.query(TABLE_ORDER, projection, selection, selectionArgs, null, null, null);
+        Order order = null;
+        if (cursor.moveToFirst()) {
+            String id = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_ID));
+            String productId = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_ID));
+            String productName = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_NAME));
+            String quantity = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY));
+            String price = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRICE));
+            String discount = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_DISCOUNT));
+            order = new Order(id, productId, productName, quantity, price, discount);
+        }
+        cursor.close();
+        db.close();
+        return order;
     }
     public boolean checkUserExists(String phoneNumber) {
         SQLiteDatabase db = getReadableDatabase();

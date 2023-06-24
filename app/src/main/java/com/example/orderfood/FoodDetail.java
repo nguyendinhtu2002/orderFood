@@ -93,13 +93,14 @@ public class FoodDetail extends AppCompatActivity {
         if (currentFood != null) {
             String quantity = numberButton.getNumber();
 
-            new Database(getBaseContext()).addToCart(new Order(
+            new MyDataBase(getBaseContext()).addToCart(new Order(
                     foodId,
                     currentFood.getName(),
                     quantity,
                     currentFood.getPrice(),
                     currentFood.getDiscount()
             ));
+            Log.d("FoodId", foodId);
 
             Toast.makeText(FoodDetail.this, "Thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
             finish();
