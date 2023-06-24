@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
@@ -14,6 +15,7 @@ import android.widget.Toast;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.example.orderfood.Database.Database;
 import com.example.orderfood.Database.FoodDatabase;
+import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Model.Food;
 import com.example.orderfood.Model.Order;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
@@ -61,15 +63,20 @@ public class FoodDetail extends AppCompatActivity {
         collapsingToolbarLayout.setExpandedTitleTextAppearance(R.style.ExpandedAppbar);
         collapsingToolbarLayout.setCollapsedTitleTextAppearance(R.style.CollapsedAppbar);
 
-        if (getIntent() != null)
+        if (getIntent() != null) {
             foodId = getIntent().getStringExtra("FoodId");
-        if (!foodId.isEmpty())
-            getDetailFood(foodId);
+
+            if (foodId != null && !foodId.isEmpty()) {
+                getDetailFood(foodId);
+            } else {
+                Toast.makeText(this,"Khong co gi",Toast.LENGTH_SHORT).show();
+            }
+        }
 
     }
 
     private void getDetailFood(String foodId) {
-        FoodDatabase foodDatabase = new FoodDatabase(this);
+        MyDataBase foodDatabase = new MyDataBase(this);
         currentFood = foodDatabase.getFoodById(foodId);
 
         if (currentFood != null) {

@@ -110,7 +110,7 @@ public class MyDataBase extends SQLiteOpenHelper {
                 int id = cursor.getInt(cursor.getColumnIndex(COLUMN_CATEGORY_ID));
                 String name = cursor.getString(cursor.getColumnIndex(COLUMN_CATEGORY_NAME));
                 String image = cursor.getString(cursor.getColumnIndex(COLUMN_CATEGORY_IMAGE));
-                Category category = new Category(name, image);
+                Category category = new Category(name, image,id);
                 categoryList.add(category);
             } while (cursor.moveToNext());
         }
@@ -126,9 +126,10 @@ public class MyDataBase extends SQLiteOpenHelper {
         Cursor cursor = db.query(TABLE_CATEGORY, projection, selection, selectionArgs, null, null, null);
         Category category = null;
         if (cursor.moveToFirst()) {
+            int id = cursor.getInt(cursor.getColumnIndex(COLUMN_CATEGORY_ID));
             String name = cursor.getString(cursor.getColumnIndex(COLUMN_CATEGORY_NAME));
             String image = cursor.getString(cursor.getColumnIndex(COLUMN_CATEGORY_IMAGE));
-            category = new Category(name, image);
+            category = new Category(name, image,id);
         }
         cursor.close();
         db.close();

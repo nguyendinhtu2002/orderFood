@@ -102,10 +102,44 @@ public class Home extends AppCompatActivity
     private void loadMenu() {
         menuList = myDatabase.getAllCategories();
 
-        // Hiển thị danh sách menu trong RecyclerView
-        adapter = new MenuAdapter(menuList);
+        // Create a new instance of MenuAdapter
+        MenuAdapter adapter = new MenuAdapter(menuList);
+
+        // Set the ItemClickListener
+        adapter.setItemClickListener(this);
+
+        // Set the adapter for the RecyclerView
         recycler_menu.setAdapter(adapter);
     }
+//private void loadMenu() {
+//    FirebaseDatabase database = FirebaseDatabase.getInstance();
+//    DatabaseReference categoryRef = database.getReference("Category");
+//
+//    // Lắng nghe sự thay đổi dữ liệu trên Firebase
+//    categoryRef.addValueEventListener(new ValueEventListener() {
+//        @Override
+//        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//            menuList = new ArrayList<>();
+//            for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
+//                Category category = categorySnapshot.getValue(Category.class);
+//                menuList.add(category);
+//
+//                // Insert danh sách menu vào SQLite
+//                myDatabase.addCategory(category);
+//            }
+//
+//            // Hiển thị danh sách menu trong RecyclerView
+//            adapter = new MenuAdapter(menuList);
+//            recycler_menu.setAdapter(adapter);
+//        }
+//
+//        @Override
+//        public void onCancelled(@NonNull DatabaseError databaseError) {
+//            // Xử lý khi có lỗi xảy ra trong quá trình đọc dữ liệu từ Firebase
+//            Toast.makeText(Home.this, "Failed to load menu: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+//        }
+//    });
+//}
     @Override
     public void onBackPressed () {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -173,13 +207,12 @@ public class Home extends AppCompatActivity
     }
     @Override
     public void onclick(View v, int position, boolean isLongClick) {
-        Toast.makeText(this,"Da click",Toast.LENGTH_SHORT).show();
         // Get the clicked category
-        Category clickedCategory = menuList.get(position);
 
+        Category clickedCategory = menuList.get(position);
         // Pass the category to the food detail activity
-        Intent foodDetailIntent = new Intent(Home.this, FoodDetail.class);
-        foodDetailIntent.putExtra("CategoryId", clickedCategory.getCategoryId());
-        startActivity(foodDetailIntent);
+        Intent intent = new Intent(Home.this, FoodList.class);
+        intent.putExtra("CategoryId", String.valueOf(clickedCategory.getCategoryId()));
+        startActivity(intent);
     }
 }

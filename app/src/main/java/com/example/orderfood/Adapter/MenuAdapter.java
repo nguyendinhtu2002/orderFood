@@ -1,5 +1,6 @@
 package com.example.orderfood.Adapter;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -10,6 +11,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.orderfood.Home;
 import com.example.orderfood.Interface.ItemClickListener;
 import com.example.orderfood.MainActivity;
 import com.example.orderfood.Model.Category;
@@ -46,17 +48,17 @@ public class MenuAdapter extends RecyclerView.Adapter<MenuAdapter.MenuViewHolder
         // Load and display image using Picasso
         Picasso.get().load(category.getImage()).into(holder.imageView);
 
-
+        // Set the item click listener on the itemView
         holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (itemClickListener != null) {
                     int clickedPosition = holder.getAdapterPosition();
                     itemClickListener.onclick(v, clickedPosition, false);
-                }
-                else{
-                    Toast.makeText(v.getContext(),"Chua an cai gi",Toast.LENGTH_SHORT).show();
-//                    Toast.makeText(MainActivity.this,"Chua an cai gi",Toast.LENGTH_SHORT).show();
+
+                } else {
+                    int clickedPosition = holder.getAdapterPosition();
+                    Toast.makeText(v.getContext(), "Item clicked at position: " + clickedPosition, Toast.LENGTH_SHORT).show();
                 }
             }
         });
