@@ -60,7 +60,7 @@ public class FoodList extends AppCompatActivity {
             if (categoryId != null) {
                 categoryId = "0" + categoryId;
                 Log.d("CategoryId", categoryId);
-                loadFoodListFromFirebase(categoryId);
+                loadFoodListFromSQLite(categoryId);
             } else {
                 Toast.makeText(this, "CategoryId is null", Toast.LENGTH_SHORT).show();
             }
@@ -80,34 +80,24 @@ public class FoodList extends AppCompatActivity {
 //        startActivity(intent);
 //    }
 
-    private void loadFoodListFromFirebase(String categoryId) {
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
-        DatabaseReference foodListRef = database.getReference("Foods");
+    private void loadFoodListFromSQLite(String categoryId) {
+        foodList = foodDatabase.getAllFoodsByCategoryId(categoryId);
 
-        // Lắng nghe sự thay đổi dữ liệu trên Firebase
-        foodListRef.orderByChild("MenuId").equalTo(categoryId).addValueEventListener(new ValueEventListener() {
+        // Hiển thị danh sách món ăn trong RecyclerView
+        adapter = new FoodAdapter(FoodList.this, foodList);
+        adapter.setItemClickListener(new ItemClickListener() {
             @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                foodList = new ArrayList<>();
-                for (DataSnapshot postSnapshot : snapshot.getChildren()) {
-                    Food food = postSnapshot.getValue(Food.class);
-                    foodList.add(food);
-                }
+            public void onclick(View view, int position, boolean isLongClick) {
+                // Lấy Food từ danh sách foodList dựa trên vị trí (position)
+                Food food = foodList.get(position);
+                Log.d("FoodList", "Clicked Food: " + food.getName() + ", Id: " + food.getId());
 
-                // Hiển thị danh sách món ăn trong RecyclerView
-                adapter = new FoodAdapter(FoodList.this, foodList);
-                recyclerView.setAdapter(adapter);
-
-                // Insert danh sách món ăn vào SQLite
-                for (Food food : foodList) {
-                    foodDatabase.insertFood(food);
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                // Xử lý khi có lỗi xảy ra
+                // Truyền foodId vào Intent và chuyển sang FoodDetail
+                Intent foodDetailIntent = new Intent(FoodList.this, FoodDetail.class);
+                foodDetailIntent.putExtra("FoodId", String.valueOf(food.getId()));
+                startActivity(foodDetailIntent);
             }
         });
+        recyclerView.setAdapter(adapter);
     }
 }

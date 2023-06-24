@@ -2,7 +2,6 @@ package com.example.orderfood.Adapter;
 
 import android.content.Context;
 import android.content.Intent;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,13 +23,17 @@ import java.util.List;
 public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder> {
     private List<Food> foodList;
     private Context context;
-    private MyDataBase myDatabase;
-    Food food = new Food();
+    private MyDataBase foodDatabase;
+    private ItemClickListener itemClickListener;
 
     public FoodAdapter(Context context, List<Food> foodList) {
         this.context = context;
         this.foodList = foodList;
-        myDatabase = new MyDataBase(context);
+        foodDatabase = new MyDataBase(context);
+    }
+
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
     }
 
     @NonNull
@@ -42,26 +45,24 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull FoodViewHolder holder, int position) {
-        String foodName = food.getName();
-
         final Food food = foodList.get(position);
-        Log.d("FoodAdapter position" , String.valueOf(position) );
+
+        String foodName = food.getName();
         holder.food_name.setText(foodName);
         Picasso.get().load(food.getImage()).into(holder.food_image);
-        holder.setItemClickListener(new ItemClickListener() {
+
+        holder.itemView.setOnClickListener(new View.OnClickListener() {
             @Override
-            public void onclick(View v, int position, boolean isLongClick) {
-                // Do something when item is clicked
-                // For example, navigate to food detail activity
-                Intent foodDetail = new Intent(context, FoodDetail.class);
-                Log.d("FoodAdapter" , String.valueOf(food.getId()) );
-                foodDetail.putExtra("FoodId", String.valueOf(food.getId()));
-                context.startActivity(foodDetail);
+            public void onClick(View v) {
+                if (itemClickListener != null) {
+                    int clickedPosition = holder.getAdapterPosition();
+                    itemClickListener.onclick(v, clickedPosition, false);
+                }
             }
         });
 
         // Insert food into SQLite database
-        myDatabase.insertFood(food);
+        foodDatabase.insertFood(food);
     }
 
     @Override
@@ -69,25 +70,14 @@ public class FoodAdapter extends RecyclerView.Adapter<FoodAdapter.FoodViewHolder
         return foodList.size();
     }
 
-    public static class FoodViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
+    public static class FoodViewHolder extends RecyclerView.ViewHolder {
         TextView food_name;
         ImageView food_image;
-        private ItemClickListener itemClickListener;
 
         public FoodViewHolder(@NonNull View itemView) {
             super(itemView);
             food_name = itemView.findViewById(R.id.food_name);
             food_image = itemView.findViewById(R.id.food_image);
-            itemView.setOnClickListener(this);
-        }
-
-        public void setItemClickListener(ItemClickListener itemClickListener) {
-            this.itemClickListener = itemClickListener;
-        }
-
-        @Override
-        public void onClick(View v) {
-            itemClickListener.onclick(v, getAdapterPosition(), false);
         }
     }
 }

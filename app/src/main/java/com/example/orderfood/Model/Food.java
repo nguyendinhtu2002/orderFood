@@ -1,28 +1,28 @@
 package com.example.orderfood.Model;
 
 public class Food {
+    private String Name, Image, Description, Price, Discount, MenuId;
+    private int ID;
 
-    private int Id;
-    private String  Name, Image, Description, Price, Discount, MenuId;
+    public int getId() {
+        return ID;
+    }
+
+    public void setId(int id) {
+        this.ID = id;
+    }
 
     public Food() {
     }
 
     public Food(int id, String name, String image, String description, String price, String discount, String menuId) {
-        Id= id;
+        ID = id;
         Name = name;
         Image = image;
         Description = description;
         Price = price;
         Discount = discount;
         MenuId = menuId;
-    }
-    public int getId() {
-        return Id;
-    }
-
-    public void setId(int id) {
-        this.Id = id;
     }
 
     public String getName() {
