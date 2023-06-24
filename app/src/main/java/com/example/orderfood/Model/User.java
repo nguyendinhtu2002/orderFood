@@ -7,7 +7,8 @@ public class User {
     public User() {
     }
 
-    public User(String name, String password) {
+    public User(String name, String password, String phone) {
+        Phone = phone;
         Name = name;
         Password = password;
     }
