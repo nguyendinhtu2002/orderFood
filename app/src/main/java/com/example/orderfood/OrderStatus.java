@@ -33,6 +33,8 @@ public class OrderStatus extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_status);
 
+        //Firebase
+
         database = FirebaseDatabase.getInstance();
         requests = database.getReference("Requests");
 
