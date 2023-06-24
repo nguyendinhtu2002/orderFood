@@ -3,15 +3,20 @@ package com.example.orderfood;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.orderfood.Adapter.FoodAdapter;
+import com.example.orderfood.Adapter.MenuAdapter;
 import com.example.orderfood.Common.Common;
+import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Interface.ItemClickListener;
 import com.example.orderfood.Model.Category;
+import com.example.orderfood.Model.Food;
 import com.example.orderfood.ViewHolder.MenuViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
@@ -33,42 +38,43 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.orderfood.databinding.ActivityHomeBinding;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.squareup.picasso.Picasso;
 
-public class Home extends AppCompatActivity
-        implements NavigationView.OnNavigationItemSelectedListener{
+import java.util.ArrayList;
+import java.util.List;
 
-    FirebaseDatabase database;
-    DatabaseReference category;
+public class Home extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener,ItemClickListener {
+
+    private RecyclerView recycler_menu;
     private AppBarConfiguration mAppBarConfiguration;
-    private ActivityHomeBinding binding;
-    TextView txtFullName;
-    RecyclerView recycler_menu;
-    RecyclerView.LayoutManager layoutManager;
-    FirebaseRecyclerAdapter<Category, MenuViewHolder> adapter;
+
+    private RecyclerView.LayoutManager layoutManager;
+    private MenuAdapter adapter;
+    private MyDataBase myDatabase;
+    private List<Category> menuList;
+    private TextView txtFullName;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(R.layout.activity_home);
 
         Toolbar toolbar = findViewById(R.id.toolbar);
         toolbar.setTitle("Menu");
         setSupportActionBar(toolbar);
 
-        //khoi tao firebase
-        database = FirebaseDatabase.getInstance();
-        category = database.getReference("Category");
-
         FloatingActionButton fab = findViewById(R.id.fab);
-        fab.setOnClickListener((view) ->{
+        fab.setOnClickListener((view) -> {
             Intent cartIntent = new Intent(Home.this, Cart.class);
             startActivity(cartIntent);
         });
+
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
                 this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
@@ -78,40 +84,28 @@ public class Home extends AppCompatActivity
         NavigationView navigationView = findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-
         View headerView = navigationView.getHeaderView(0);
         txtFullName = headerView.findViewById(R.id.txtFullName);
         txtFullName.setText(Common.currentUser.getName());
 
-        //Load Menu
         recycler_menu = findViewById(R.id.recycler_menu);
         recycler_menu.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recycler_menu.setLayoutManager(layoutManager);
+
+        myDatabase = new MyDataBase(this);
+
         loadMenu();
     }
 
+
     private void loadMenu() {
-        adapter = new FirebaseRecyclerAdapter<Category, MenuViewHolder>(Category.class, R.layout.menu_item, MenuViewHolder.class, category ) {
-            @Override
-            protected void populateViewHolder(MenuViewHolder viewHolder, Category model, int position) {
-                viewHolder.txtMenuName.setText(model.getName());
-                Picasso.get().load(model.getImage()).into(viewHolder.imageView);
-                Category clickItem = model;
-                viewHolder.setItemClickListener(new ItemClickListener() {
-                    @Override
-                    public void onclick(View v, int position, boolean isLongClick) {
-                        //get category
-                        Intent foodList = new Intent(Home.this, FoodList.class);
-                        foodList.putExtra("CategoryId", adapter.getRef(position).getKey());
-                        startActivity(foodList);
-                    }
-                });
-            }
-        };
+        menuList = myDatabase.getAllCategories();
+
+        // Hiển thị danh sách menu trong RecyclerView
+        adapter = new MenuAdapter(menuList);
         recycler_menu.setAdapter(adapter);
     }
-
     @Override
     public void onBackPressed () {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -142,8 +136,6 @@ public class Home extends AppCompatActivity
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
         int id = item.getItemId();
 
-//        if (id == R.id.nav_menu){
-//        }
         if (id == R.id.nav_cart) {
             Intent cartIntent = new Intent(Home.this, Cart.class);
             startActivity(cartIntent);
@@ -159,7 +151,7 @@ public class Home extends AppCompatActivity
             builder.setPositiveButton("Đăng xuất", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // Thực hiện đăng xuất
+                    // Perform logout
                     Intent logOutIntent = new Intent(Home.this, MainActivity.class);
                     logOutIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(logOutIntent);
@@ -168,7 +160,6 @@ public class Home extends AppCompatActivity
             builder.setNegativeButton("Hủy", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialog, int which) {
-                    // Không làm gì cả
                     dialog.dismiss();
                 }
             });
@@ -176,9 +167,19 @@ public class Home extends AppCompatActivity
             dialog.show();
         }
 
-
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
+    }
+    @Override
+    public void onclick(View v, int position, boolean isLongClick) {
+        Toast.makeText(this,"Da click",Toast.LENGTH_SHORT).show();
+        // Get the clicked category
+        Category clickedCategory = menuList.get(position);
+
+        // Pass the category to the food detail activity
+        Intent foodDetailIntent = new Intent(Home.this, FoodDetail.class);
+        foodDetailIntent.putExtra("CategoryId", clickedCategory.getCategoryId());
+        startActivity(foodDetailIntent);
     }
 }
