@@ -9,6 +9,7 @@
     <color name="white">#FFFFFFFF</color>
     <color name="btnSignUp">#39796b</color>
     <color name="btnSignIn">#165463</color>
+    <color name="blue">#0000FF</color>
 
     <color name="btnFood">#1F7185</color>
     <color name="overlayBackground">#7f333639</color>
