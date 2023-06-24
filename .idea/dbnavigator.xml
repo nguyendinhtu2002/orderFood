@@ -28,13 +28,6 @@
   <component name="DBNavigator.Project.DatabaseFileManager">
     <open-files />
   </component>
-  <component name="DBNavigator.Project.DatasetFilterManager">
-    <filter-actions connection-id="b227facb-e3b4-445d-8c19-70784ac93726" dataset="main.OrderDetail" active-filter-id="8c7c5650-9ec0-43a4-8c50-af90c3fdd32a">
-      <filter id="8c7c5650-9ec0-43a4-8c50-af90c3fdd32a" name="1" temporary="false" custom-name="false" type="basic" join-type="AND">
-        <condition column="ID" operator="&gt;=" value="1" active="true" />
-      </filter>
-    </filter-actions>
-  </component>
   <component name="DBNavigator.Project.ExecutionManager">
     <retain-sticky-names value="false" />
   </component>

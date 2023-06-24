@@ -4,7 +4,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.os.Bundle;
+import android.view.View;
+import android.widget.Button;
 
 import com.example.orderfood.Common.Common;
 import com.example.orderfood.Model.Request;
@@ -18,14 +22,18 @@ public class OrderStatus extends AppCompatActivity {
 
     public RecyclerView recyclerView;
     public RecyclerView.LayoutManager layoutManager;
+    Button btnHomeBack;
     FirebaseRecyclerAdapter<Request, OrderViewHolder> adapter;
 
     FirebaseDatabase database;
     DatabaseReference requests;
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_status);
+
+        //Firebase
 
         database = FirebaseDatabase.getInstance();
         requests = database.getReference("Requests");
@@ -37,6 +45,14 @@ public class OrderStatus extends AppCompatActivity {
 
         loadOrders(Common.currentUser.getPhone());
 
+        btnHomeBack = findViewById(R.id.btnHomeBack);
+        btnHomeBack.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent foodBack = new Intent(OrderStatus.this, Home.class);
+                startActivity(foodBack);
+            }
+        });
     }
 
     private void loadOrders(String phone) {
