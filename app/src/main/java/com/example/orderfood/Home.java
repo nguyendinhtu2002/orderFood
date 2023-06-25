@@ -87,14 +87,13 @@ public class Home extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         txtFullName = headerView.findViewById(R.id.txtFullName);
         txtFullName.setText(Common.currentUser.getName());
-
+        Log.d("IdUser", Common.currentUser.getPhone());
         recycler_menu = findViewById(R.id.recycler_menu);
         recycler_menu.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
         recycler_menu.setLayoutManager(layoutManager);
 
         myDatabase = new MyDataBase(this);
-
         loadMenu();
     }
 
@@ -111,35 +110,36 @@ public class Home extends AppCompatActivity
         // Set the adapter for the RecyclerView
         recycler_menu.setAdapter(adapter);
     }
-//private void loadMenu() {
-//    FirebaseDatabase database = FirebaseDatabase.getInstance();
-//    DatabaseReference categoryRef = database.getReference("Category");
+
+//    private void loadMenu() {
+//        FirebaseDatabase database = FirebaseDatabase.getInstance();
+//        DatabaseReference categoryRef = database.getReference("Category");
 //
-//    // Lắng nghe sự thay đổi dữ liệu trên Firebase
-//    categoryRef.addValueEventListener(new ValueEventListener() {
-//        @Override
-//        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//            menuList = new ArrayList<>();
-//            for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
-//                Category category = categorySnapshot.getValue(Category.class);
-//                menuList.add(category);
+//        // Lắng nghe sự thay đổi dữ liệu trên Firebase
+//        categoryRef.addValueEventListener(new ValueEventListener() {
+//            @Override
+//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+//                menuList = new ArrayList<>();
+//                for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
+//                    Category category = categorySnapshot.getValue(Category.class);
+//                    menuList.add(category);
 //
-//                // Insert danh sách menu vào SQLite
-//                myDatabase.addCategory(category);
+//                    // Insert danh sách menu vào SQLite
+//                    myDatabase.addCategory(category);
+//                }
+//
+//                // Hiển thị danh sách menu trong RecyclerView
+//                adapter = new MenuAdapter(menuList);
+//                recycler_menu.setAdapter(adapter);
 //            }
 //
-//            // Hiển thị danh sách menu trong RecyclerView
-//            adapter = new MenuAdapter(menuList);
-//            recycler_menu.setAdapter(adapter);
-//        }
-//
-//        @Override
-//        public void onCancelled(@NonNull DatabaseError databaseError) {
-//            // Xử lý khi có lỗi xảy ra trong quá trình đọc dữ liệu từ Firebase
-//            Toast.makeText(Home.this, "Failed to load menu: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-//        }
-//    });
-//}
+//            @Override
+//            public void onCancelled(@NonNull DatabaseError databaseError) {
+//                // Xử lý khi có lỗi xảy ra trong quá trình đọc dữ liệu từ Firebase
+//                Toast.makeText(Home.this, "Failed to load menu: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
+//            }
+//        });
+//    }
     @Override
     public void onBackPressed () {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);

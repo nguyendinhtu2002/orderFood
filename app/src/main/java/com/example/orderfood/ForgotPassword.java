@@ -10,7 +10,6 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.orderfood.Database.MyDataBase;
-import com.example.orderfood.Database.UserDatabase;
 
 import java.util.Properties;
 import java.util.regex.Pattern;

@@ -13,10 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.Database;
 import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Model.Food;
 import com.example.orderfood.Model.Order;
+import com.example.orderfood.Model.User;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.squareup.picasso.Picasso;
 
@@ -27,7 +29,6 @@ public class FoodDetail extends AppCompatActivity {
     CollapsingToolbarLayout collapsingToolbarLayout;
     Button btnCart, btnFoodBack;
     ElegantNumberButton numberButton;
-
     Food currentFood;
     String foodId = "";
 
@@ -50,6 +51,7 @@ public class FoodDetail extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addToCart();
+                Log.d("FoodDetail, UserPhone: ", Common.currentUser.getPhone());
             }
         });
 
@@ -76,7 +78,9 @@ public class FoodDetail extends AppCompatActivity {
 
     private void getDetailFood(String foodId) {
         MyDataBase foodDatabase = new MyDataBase(this);
+
         currentFood = foodDatabase.getFoodById(foodId);
+
 
         if (currentFood != null) {
             Picasso.get().load(currentFood.getImage()).into(food_image);
@@ -89,16 +93,20 @@ public class FoodDetail extends AppCompatActivity {
     }
 
     private void addToCart() {
-        if (currentFood != null) {
-            String quantity = numberButton.getNumber();
 
-            new Database(getBaseContext()).addToCart(new Order(
-                    foodId,
-                    currentFood.getName(),
-                    quantity,
-                    currentFood.getPrice(),
-                    currentFood.getDiscount()
-            ));
+        if (currentFood != null) {
+
+                String quantity = numberButton.getNumber();
+
+
+                new MyDataBase(getBaseContext()).addToCart(new Order(
+                        Common.currentUser.getPhone(),
+                        foodId,
+                        currentFood.getName(),
+                        quantity,
+                        currentFood.getPrice(),
+                        currentFood.getDiscount()
+                ));
 
             Toast.makeText(FoodDetail.this, "Thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
             finish();

@@ -9,10 +9,16 @@ import android.util.Log;
 
 import com.example.orderfood.Model.Category;
 import com.example.orderfood.Model.Food;
+import com.example.orderfood.Model.HistoryOrder;
+import com.example.orderfood.Model.Order;
 import com.example.orderfood.Model.User;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class MyDataBase extends SQLiteOpenHelper {
     private static final String DB_NAME = "FoodAppDB.db";
@@ -20,8 +26,14 @@ public class MyDataBase extends SQLiteOpenHelper {
     private static final String TABLE_USERS = "Users";
     private static final String TABLE_FOODS = "Foods";
     private static final String TABLE_CATEGORY = "Categories";
+    private static final String TABLE_ORDER = "OrderDetail";
+    private static final String TABLE_HISTORY_ORDER = "history_order";
 
-
+    private static final String COLUMN_HISTORY_ID = "orderId";
+    private static final String COLUMN_HISTORY_PRICE = "Price";
+    private static final String COLUMN_HISTORY_PHONE = "userPhone";
+    private static final String COLUMN_HISTORY_DATE = "creationDate";
+    private static final String COLUMN_HISTORY_ADDRESS = "deliveryAddress";
     // Columns for the Users table
     private static final String COL_Phone = "Phone";
     private static final String COL_Name = "Name";
@@ -37,10 +49,20 @@ public class MyDataBase extends SQLiteOpenHelper {
     private static final String COL_DISCOUNT = "Discount";
     private static final String COL_MENU_ID = "MenuId";
 
+
+    // Columns for the Category table
     private static final String COLUMN_CATEGORY_ID = "id";
     private static final String COLUMN_CATEGORY_NAME = "name";
     private static final String COLUMN_CATEGORY_IMAGE = "image";
 
+    //Column for the Order table
+    private static final String COLUMN_ORDER_ID = "Id";
+    private static final String COLUMN_ORDER_USER_PHONE = "UserPhone";
+    private static final String COLUMN_ORDER_PRODUCT_ID = "ProductId";
+    private static final String COLUMN_ORDER_PRODUCT_NAME = "ProductName";
+    private static final String COLUMN_ORDER_QUANTITY = "Quantity";
+    private static final String COLUMN_ORDER_PRICE = "Price";
+    private static final String COLUMN_ORDER_DISCOUNT = "Discount";
 
 
     public MyDataBase(Context context) {
@@ -75,6 +97,27 @@ public class MyDataBase extends SQLiteOpenHelper {
                 COLUMN_CATEGORY_IMAGE + " TEXT" +
                 ")";
         db.execSQL(CREATE_CATEGORY_TABLE);
+
+        String CREATE_ORDER_TABLE = "CREATE TABLE " + TABLE_ORDER +
+                "(" +
+                COLUMN_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
+                COLUMN_ORDER_USER_PHONE + " TEXT," +
+                COLUMN_ORDER_PRODUCT_ID + " TEXT," +
+                COLUMN_ORDER_PRODUCT_NAME + " TEXT," +
+                COLUMN_ORDER_QUANTITY + " TEXT," +
+                COLUMN_ORDER_PRICE + " TEXT," +
+                COLUMN_ORDER_DISCOUNT + " TEXT" +
+                ")";
+        db.execSQL(CREATE_ORDER_TABLE);
+        String CREATE_TABLE_HISTORY_ORDER = "CREATE TABLE " + TABLE_HISTORY_ORDER + "("
+                + COLUMN_HISTORY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT,"
+                + COLUMN_HISTORY_PRICE + " INTEGER,"
+                + COLUMN_HISTORY_PHONE + " TEXT,"
+                + COLUMN_HISTORY_DATE + " DATE,"
+                + COLUMN_HISTORY_ADDRESS + " TEXT"
+                + ")";
+        db.execSQL(CREATE_TABLE_HISTORY_ORDER);
+
     }
 
     @Override
@@ -82,6 +125,8 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_USERS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_FOODS);
         db.execSQL("DROP TABLE IF EXISTS " + TABLE_CATEGORY);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_ORDER);
+        db.execSQL("DROP TABLE IF EXISTS " + TABLE_HISTORY_ORDER);
 
         onCreate(db);
     }
@@ -106,6 +151,49 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.insert(TABLE_CATEGORY, null, values);
         db.close();
     }
+    public void addFood(Food food) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COL_FOOD_NAME, food.getName());
+        values.put(COL_IMAGE, food.getImage());
+        values.put(COL_DESCRIPTION, food.getDescription());
+        values.put(COL_PRICE, food.getPrice());
+        values.put(COL_DISCOUNT, food.getDiscount());
+        values.put(COL_MENU_ID, food.getMenuId());
+        db.insert(TABLE_FOODS, null, values);
+        db.close();
+    }
+    public void addToCart(Order order) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues values = new ContentValues();
+        values.put(COLUMN_ORDER_USER_PHONE, order.getUserPhone());
+        values.put(COLUMN_ORDER_PRODUCT_ID, order.getProductId());
+        values.put(COLUMN_ORDER_PRODUCT_NAME, order.getProductName());
+        values.put(COLUMN_ORDER_PRICE, order.getPrice());
+        values.put(COLUMN_ORDER_DISCOUNT, order.getDiscount());
+
+        // Kiểm tra xem sản phẩm đã có trong đơn hàng hay chưa
+        String selection = COLUMN_ORDER_PRODUCT_ID + " = ?";
+        String[] selectionArgs = {order.getProductId()};
+        Cursor cursor = db.query(TABLE_ORDER, null, selection, selectionArgs, null, null, null);
+
+        if (cursor.moveToFirst()) {
+            // Sản phẩm đã tồn tại trong đơn hàng, tăng số lượng lên
+            int currentQuantity = Integer.parseInt(cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY)));
+            int newQuantity = currentQuantity + Integer.parseInt(order.getQuantity());
+            values.put(COLUMN_ORDER_QUANTITY, String.valueOf(newQuantity));
+            db.update(TABLE_ORDER, values, selection, selectionArgs);
+        } else {
+            // Sản phẩm chưa tồn tại trong đơn hàng, thêm mới
+            values.put(COLUMN_ORDER_QUANTITY, order.getQuantity());
+            db.insert(TABLE_ORDER, null, values);
+        }
+
+        cursor.close();
+        db.close();
+    }
+
+
     public List<Category> getAllCategories() {
         List<Category> categoryList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
@@ -123,6 +211,49 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.close();
         return categoryList;
     }
+
+
+
+    public List<Order> getCarts(String userPhone) {
+        List<Order> orderList = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ORDER +
+                " WHERE " + COLUMN_ORDER_USER_PHONE + " = ?", new String[]{userPhone});
+        if (cursor.moveToFirst()) {
+            do {
+                String id = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_ID));
+                String productId = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_ID));
+                String productName = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_NAME));
+                String quantity = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY));
+                String price = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRICE));
+                String discount = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_DISCOUNT));
+                Order order = new Order(id, productId, productName, quantity, price, discount);
+                orderList.add(order);
+            } while (cursor.moveToNext());
+        }
+        return orderList;
+    }
+
+    public boolean checkFoodExist(String phoneNumber, String food_id) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] columns = {COLUMN_ORDER_USER_PHONE, COLUMN_ORDER_PRODUCT_ID};
+        String selection = COLUMN_ORDER_USER_PHONE + " = ? AND " + COLUMN_ORDER_PRODUCT_ID + " = ?";
+        String[] selectionArgs = {phoneNumber, food_id};
+        Cursor cursor = db.query(TABLE_ORDER, columns, selection, selectionArgs, null, null, null);
+        boolean orderExists = cursor.moveToFirst();
+        if (orderExists) {
+            String existingQuantity = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY));
+
+            int newQuantity = Integer.parseInt(existingQuantity) + 1;
+
+            ContentValues values = new ContentValues();
+            values.put(COLUMN_ORDER_QUANTITY, String.valueOf(newQuantity));
+            db.update(TABLE_ORDER, values, selection, selectionArgs);
+        }
+        cursor.close();
+        db.close();
+        return orderExists;
+    }
     public Category getCategoryById(String categoryId) {
         SQLiteDatabase db = getReadableDatabase();
         String[] projection = {COLUMN_CATEGORY_ID, COLUMN_CATEGORY_NAME, COLUMN_CATEGORY_IMAGE};
@@ -139,6 +270,26 @@ public class MyDataBase extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return category;
+    }
+    public Order getOrderById(String orderId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String[] projection = {COLUMN_ORDER_ID, COLUMN_ORDER_PRODUCT_ID, COLUMN_ORDER_PRODUCT_NAME, COLUMN_ORDER_QUANTITY, COLUMN_ORDER_PRICE, COLUMN_ORDER_DISCOUNT};
+        String selection = COLUMN_ORDER_ID + " = ?";
+        String[] selectionArgs = {String.valueOf(orderId)};
+        Cursor cursor = db.query(TABLE_ORDER, projection, selection, selectionArgs, null, null, null);
+        Order order = null;
+        if (cursor.moveToFirst()) {
+            String id = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_ID));
+            String productId = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_ID));
+            String productName = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_NAME));
+            String quantity = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY));
+            String price = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRICE));
+            String discount = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_DISCOUNT));
+            order = new Order(id, productId, productName, quantity, price, discount);
+        }
+        cursor.close();
+        db.close();
+        return order;
     }
     public boolean checkUserExists(String phoneNumber) {
         SQLiteDatabase db = getReadableDatabase();
@@ -279,5 +430,66 @@ public class MyDataBase extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return foodList;
+    }
+
+    public void cleanCart()
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = String.format("DELETE FROM " + TABLE_ORDER);
+        db.execSQL(query);
+    }
+    private String formatDate(Date date) {
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+        return sdf.format(date);
+    }
+    public void addHistory(HistoryOrder historyOrder) {
+        SQLiteDatabase db = getWritableDatabase();
+        ContentValues orderValues = new ContentValues();
+        orderValues.put(COLUMN_HISTORY_PHONE, historyOrder.getUserPhone());
+        orderValues.put(COLUMN_HISTORY_DATE, formatDate(historyOrder.getCreationDate()));
+        orderValues.put(COLUMN_HISTORY_ADDRESS, historyOrder.getDeliveryAddress());
+        orderValues.put(COLUMN_HISTORY_PRICE, historyOrder.getPrice());
+        db.insert(TABLE_HISTORY_ORDER, null, orderValues);
+        db.close();
+    }
+
+    public List<HistoryOrder> getAllHistoryOrdersByPhone(String phone) {
+        List<HistoryOrder> historyOrders = new ArrayList<>();
+
+        SQLiteDatabase db = getReadableDatabase();
+
+        String selectQuery = "SELECT * FROM " + TABLE_HISTORY_ORDER + " WHERE " + COLUMN_HISTORY_PHONE + " = ?";
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{phone});
+
+        if (cursor.moveToFirst()) {
+            do {
+                // Retrieve the history order details from the cursor
+                String userPhone = cursor.getString(cursor.getColumnIndex(COLUMN_HISTORY_PHONE));
+                String creationDateStr = cursor.getString(cursor.getColumnIndex(COLUMN_HISTORY_DATE));
+                String deliveryAddress = cursor.getString(cursor.getColumnIndex(COLUMN_HISTORY_ADDRESS));
+                String price = cursor.getString(cursor.getColumnIndex(COLUMN_HISTORY_PRICE));
+
+                // Convert the creation date string to a Date object
+                SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
+                Date creationDate;
+                try {
+                    creationDate = sdf.parse(creationDateStr);
+                } catch (ParseException e) {
+                    e.printStackTrace();
+                    continue; // Skip this iteration if the creation date is invalid
+                }
+
+                // Create a new HistoryOrder object
+                HistoryOrder historyOrder = new HistoryOrder(userPhone, deliveryAddress, creationDate,price);
+
+                // Add the HistoryOrder to the list
+                historyOrders.add(historyOrder);
+            } while (cursor.moveToNext());
+        }
+
+        cursor.close();
+        db.close();
+
+        return historyOrders;
     }
 }
