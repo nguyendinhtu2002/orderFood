@@ -166,6 +166,26 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.close();
         return categoryList;
     }
+
+    public List<Order> getCarts(){
+        List<Order> orderList = new ArrayList<>();
+        SQLiteDatabase db = getReadableDatabase();
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_CATEGORY, null);
+        if (cursor.moveToFirst()) {
+            do {
+                String id = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_ID));
+                String productId = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_ID));
+                String productName = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_NAME));
+                String quantity = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY));
+                String price = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRICE));
+                String discount = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_DISCOUNT));
+                Order order = new Order(id, productId, productName, quantity, price, discount);
+                orderList.add(order);
+            } while (cursor.moveToNext());
+        }
+        return orderList;
+    }
+
     public Category getCategoryById(String categoryId) {
         SQLiteDatabase db = getReadableDatabase();
         String[] projection = {COLUMN_CATEGORY_ID, COLUMN_CATEGORY_NAME, COLUMN_CATEGORY_IMAGE};
@@ -342,5 +362,12 @@ public class MyDataBase extends SQLiteOpenHelper {
         cursor.close();
         db.close();
         return foodList;
+    }
+
+    public void cleanCart()
+    {
+        SQLiteDatabase db = getWritableDatabase();
+        String query = String.format("DELETE FROM" + TABLE_ORDER);
+        db.execSQL(query);
     }
 }

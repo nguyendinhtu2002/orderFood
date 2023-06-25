@@ -16,7 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.orderfood.Common.Common;
-import com.example.orderfood.Database.Database;
+import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Model.Order;
 import com.example.orderfood.Model.Request;
 import com.example.orderfood.ViewHolder.CartAdapter;
@@ -31,6 +31,7 @@ import java.util.Locale;
 public class Cart extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
+
 
     FirebaseDatabase database;
     DatabaseReference requests;
@@ -101,7 +102,7 @@ public class Cart extends AppCompatActivity {
                 //submit to database
                 requests.child(String.valueOf(System.currentTimeMillis())).setValue(request);
 
-                new Database(getBaseContext()).cleanCart();
+                new MyDataBase(getBaseContext()).cleanCart();
                 Toast.makeText(Cart.this, "Đặt hàng thành công", Toast.LENGTH_LONG).show();
                 finish();
             }
@@ -116,12 +117,10 @@ public class Cart extends AppCompatActivity {
     }
 
     private void loadListFood() {
-        cart = new Database(this).getCarts();
+        cart = new MyDataBase(this).getCarts();
         adapter = new CartAdapter(cart, this);
         recyclerView.setAdapter(adapter);
-
         //calc total
-
         int total = 0;
         for(Order order:cart)
             total+=(Integer.parseInt(order.getPrice()))*(Integer.parseInt(order.getQuantity()));
