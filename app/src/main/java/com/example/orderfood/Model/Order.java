@@ -2,6 +2,7 @@ package com.example.orderfood.Model;
 
 public class Order {
     private String Id;
+    private String UserPhone;
     private String ProductId;
     private String ProductName;
     private String Quantity;
@@ -11,8 +12,9 @@ public class Order {
     public Order() {
     }
 
-    public Order(String id,String productId, String productName, String quantity, String price, String discount) {
+    public Order(String id,String userPhone, String productId, String productName, String quantity, String price, String discount) {
         Id=id;
+        UserPhone=userPhone;
         ProductId = productId;
         ProductName = productName;
         Quantity = quantity;
@@ -20,12 +22,29 @@ public class Order {
         Discount = discount;
     }
 
-    public Order(String productId, String productName, String quantity, String price, String discount) {
+    public Order(String productId,String userPhone, String productName, String quantity, String price, String discount) {
+        UserPhone=userPhone;
         ProductId = productId;
         ProductName = productName;
         Quantity = quantity;
         Price = price;
         Discount = discount;
+    }
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        Id = id;
+    }
+
+    public String getUserPhone() {
+        return UserPhone;
+    }
+
+    public void setUserPhone(String userPhone) {
+        UserPhone = userPhone;
     }
 
     public String getProductId() {

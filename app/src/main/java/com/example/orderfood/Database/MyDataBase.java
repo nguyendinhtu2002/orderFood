@@ -46,6 +46,7 @@ public class MyDataBase extends SQLiteOpenHelper {
 
     //Column for the Order table
     private static final String COLUMN_ORDER_ID = "Id";
+    private static final String COLUMN_ORDER_USER_PHONE = "UserPhone";
     private static final String COLUMN_ORDER_PRODUCT_ID = "ProductId";
     private static final String COLUMN_ORDER_PRODUCT_NAME = "ProductName";
     private static final String COLUMN_ORDER_QUANTITY = "Quantity";
@@ -89,12 +90,14 @@ public class MyDataBase extends SQLiteOpenHelper {
         String CREATE_ORDER_TABLE = "CREATE TABLE " + TABLE_ORDER +
                 "(" +
                 COLUMN_ORDER_ID + " INTEGER PRIMARY KEY AUTOINCREMENT," +
-                COLUMN_ORDER_PRODUCT_ID + " INTEGER," +
+                COLUMN_ORDER_USER_PHONE + " TEXT," +
+                COLUMN_ORDER_PRODUCT_ID + " TEXT," +
                 COLUMN_ORDER_PRODUCT_NAME + " TEXT," +
-                COLUMN_ORDER_QUANTITY + " INTEGER," +
-                COLUMN_ORDER_PRICE + " INTEGER," +
-                COLUMN_ORDER_DISCOUNT + " INTEGER" +
+                COLUMN_ORDER_QUANTITY + " TEXT," +
+                COLUMN_ORDER_PRICE + " TEXT," +
+                COLUMN_ORDER_DISCOUNT + " TEXT" +
                 ")";
+        db.execSQL(CREATE_ORDER_TABLE);
     }
 
     @Override
@@ -141,6 +144,7 @@ public class MyDataBase extends SQLiteOpenHelper {
     public void addToCart(Order order) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
+        values.put(COLUMN_ORDER_USER_PHONE, order.getUserPhone());
         values.put(COLUMN_ORDER_PRODUCT_ID, order.getProductId());
         values.put(COLUMN_ORDER_PRODUCT_NAME, order.getProductName());
         values.put(COLUMN_ORDER_QUANTITY, order.getQuantity());
@@ -167,10 +171,11 @@ public class MyDataBase extends SQLiteOpenHelper {
         return categoryList;
     }
 
-    public List<Order> getCarts(){
+    public List<Order> getCarts(String userPhone) {
         List<Order> orderList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_CATEGORY, null);
+        Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ORDER +
+                " WHERE " + COLUMN_ORDER_USER_PHONE + " = ?", new String[]{userPhone});
         if (cursor.moveToFirst()) {
             do {
                 String id = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_ID));
@@ -367,7 +372,7 @@ public class MyDataBase extends SQLiteOpenHelper {
     public void cleanCart()
     {
         SQLiteDatabase db = getWritableDatabase();
-        String query = String.format("DELETE FROM" + TABLE_ORDER);
+        String query = String.format("DELETE FROM " + TABLE_ORDER);
         db.execSQL(query);
     }
 }

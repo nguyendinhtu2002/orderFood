@@ -8,6 +8,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -32,9 +33,6 @@ public class Cart extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
 
-
-    FirebaseDatabase database;
-    DatabaseReference requests;
     TextView txtTotalPrice;
     Button btnPlace, btnCartBack;
 
@@ -46,8 +44,7 @@ public class Cart extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
 
-        database = FirebaseDatabase.getInstance();
-        requests = database.getReference("Requests");
+
 
         recyclerView = findViewById(R.id.listCart);
         recyclerView.setHasFixedSize(true);
@@ -91,16 +88,16 @@ public class Cart extends AppCompatActivity {
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Request request = new Request(
-                        Common.currentUser.getPhone(),
-                        Common.currentUser.getName(),
-                        edtAddress.getText().toString(),
-                        txtTotalPrice.getText().toString(),
-                        cart
-                );
-
-                //submit to database
-                requests.child(String.valueOf(System.currentTimeMillis())).setValue(request);
+//                Request request = new Request(
+//                        Common.currentUser.getPhone(),
+//                        Common.currentUser.getName(),
+//                        edtAddress.getText().toString(),
+//                        txtTotalPrice.getText().toString(),
+//                        cart
+//                );
+//
+//                //submit to database
+//                requests.child(String.valueOf(System.currentTimeMillis())).setValue(request);
 
                 new MyDataBase(getBaseContext()).cleanCart();
                 Toast.makeText(Cart.this, "Đặt hàng thành công", Toast.LENGTH_LONG).show();
@@ -117,13 +114,15 @@ public class Cart extends AppCompatActivity {
     }
 
     private void loadListFood() {
-        cart = new MyDataBase(this).getCarts();
+        cart = new MyDataBase(this).getCarts(Common.currentUser.getPhone());
         adapter = new CartAdapter(cart, this);
         recyclerView.setAdapter(adapter);
         //calc total
         int total = 0;
-        for(Order order:cart)
+        for(Order order:cart){
             total+=(Integer.parseInt(order.getPrice()))*(Integer.parseInt(order.getQuantity()));
+            Log.d("Order",order.getId());
+        }
         Locale locale = new Locale("vi", "VN");
         NumberFormat fmt = NumberFormat.getCurrencyInstance(locale);
 

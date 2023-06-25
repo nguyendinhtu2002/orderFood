@@ -13,10 +13,12 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
+import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.Database;
 import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Model.Food;
 import com.example.orderfood.Model.Order;
+import com.example.orderfood.Model.User;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.squareup.picasso.Picasso;
 
@@ -27,7 +29,6 @@ public class FoodDetail extends AppCompatActivity {
     CollapsingToolbarLayout collapsingToolbarLayout;
     Button btnCart, btnFoodBack;
     ElegantNumberButton numberButton;
-
     Food currentFood;
     String foodId = "";
 
@@ -50,6 +51,7 @@ public class FoodDetail extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 addToCart();
+                Log.d("FoodDetail, UserPhone: ", Common.currentUser.getPhone());
             }
         });
 
@@ -66,7 +68,6 @@ public class FoodDetail extends AppCompatActivity {
             foodId = getIntent().getStringExtra("FoodId");
 
             if (foodId != null && !foodId.isEmpty()) {
-                Log.d("FoodId", foodId);
                 getDetailFood(foodId);
             } else {
                 Toast.makeText(this,"Khong co gi",Toast.LENGTH_SHORT).show();
@@ -94,6 +95,7 @@ public class FoodDetail extends AppCompatActivity {
             String quantity = numberButton.getNumber();
 
             new MyDataBase(getBaseContext()).addToCart(new Order(
+                    Common.currentUser.getPhone(),
                     foodId,
                     currentFood.getName(),
                     quantity,
