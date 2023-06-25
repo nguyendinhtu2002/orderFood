@@ -21,6 +21,7 @@ public class MyDataBase extends SQLiteOpenHelper {
     private static final String TABLE_FOODS = "Foods";
     private static final String TABLE_CATEGORY = "Categories";
 
+
     // Columns for the Users table
     private static final String COL_Phone = "Phone";
     private static final String COL_Name = "Name";
@@ -39,6 +40,9 @@ public class MyDataBase extends SQLiteOpenHelper {
     private static final String COLUMN_CATEGORY_ID = "id";
     private static final String COLUMN_CATEGORY_NAME = "name";
     private static final String COLUMN_CATEGORY_IMAGE = "image";
+
+
+
     public MyDataBase(Context context) {
         super(context, DB_NAME, null, DB_VER);
     }

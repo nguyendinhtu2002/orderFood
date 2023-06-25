@@ -17,7 +17,6 @@ import com.example.orderfood.Database.UserDatabase;
 import com.example.orderfood.Interface.ItemClickListener;
 import com.example.orderfood.Model.Food;
 import com.example.orderfood.Model.User;
-import com.example.orderfood.ViewHolder.FoodViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
