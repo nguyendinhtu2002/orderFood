@@ -24,7 +24,7 @@
             tools:ignore="UselessParent">
 
             <TextView
-                android:id="@+id/order_id"
+                android:id="@+id/txtOrderId"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="10dp"
@@ -69,7 +69,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/order_name"
+                    android:id="@+id/txtOrderName"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
@@ -91,7 +91,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/order_phone"
+                    android:id="@+id/txtOrderPhone"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
@@ -113,7 +113,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/order_address"
+                    android:id="@+id/txtOrderAddress"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"
@@ -136,7 +136,7 @@
                     android:textStyle="bold" />
 
                 <TextView
-                    android:id="@+id/order_price"
+                    android:id="@+id/txtOrderPrice"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:padding="4dp"

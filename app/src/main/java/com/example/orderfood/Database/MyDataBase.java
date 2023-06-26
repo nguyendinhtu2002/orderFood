@@ -214,20 +214,21 @@ public class MyDataBase extends SQLiteOpenHelper {
 
 
 
-    public List<Order> getCarts(String userPhone) {
+    public List<Order> getCarts(String phone) {
         List<Order> orderList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
         Cursor cursor = db.rawQuery("SELECT * FROM " + TABLE_ORDER +
-                " WHERE " + COLUMN_ORDER_USER_PHONE + " = ?", new String[]{userPhone});
+                " WHERE " + COLUMN_ORDER_USER_PHONE + " = ?", new String[]{phone});
         if (cursor.moveToFirst()) {
             do {
                 String id = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_ID));
+                String userPhone= cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_USER_PHONE));
                 String productId = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_ID));
                 String productName = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_NAME));
                 String quantity = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY));
                 String price = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRICE));
                 String discount = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_DISCOUNT));
-                Order order = new Order(id, productId, productName, quantity, price, discount);
+                Order order = new Order(id,userPhone, productId, productName, quantity, price, discount);
                 orderList.add(order);
             } while (cursor.moveToNext());
         }
@@ -271,25 +272,30 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.close();
         return category;
     }
-    public Order getOrderById(String orderId) {
+    public List<Order> getAllOrdersByUserPhone(String phone) {
+        List<Order> orderList = new ArrayList<>();
         SQLiteDatabase db = getReadableDatabase();
-        String[] projection = {COLUMN_ORDER_ID, COLUMN_ORDER_PRODUCT_ID, COLUMN_ORDER_PRODUCT_NAME, COLUMN_ORDER_QUANTITY, COLUMN_ORDER_PRICE, COLUMN_ORDER_DISCOUNT};
-        String selection = COLUMN_ORDER_ID + " = ?";
-        String[] selectionArgs = {String.valueOf(orderId)};
+        String[] projection = {COLUMN_ORDER_ID,COLUMN_ORDER_USER_PHONE ,COLUMN_ORDER_PRODUCT_ID, COLUMN_ORDER_PRODUCT_NAME, COLUMN_ORDER_QUANTITY, COLUMN_ORDER_PRICE, COLUMN_ORDER_DISCOUNT};
+        String selection = COLUMN_ORDER_USER_PHONE + " = ?";
+        String[] selectionArgs = {String.valueOf(phone)};
         Cursor cursor = db.query(TABLE_ORDER, projection, selection, selectionArgs, null, null, null);
         Order order = null;
         if (cursor.moveToFirst()) {
-            String id = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_ID));
-            String productId = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_ID));
-            String productName = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_NAME));
-            String quantity = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY));
-            String price = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRICE));
-            String discount = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_DISCOUNT));
-            order = new Order(id, productId, productName, quantity, price, discount);
+            do {
+                String id = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_ID));
+                String userPhone = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_USER_PHONE));
+                String productId = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_ID));
+                String productName = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRODUCT_NAME));
+                String quantity = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_QUANTITY));
+                String price = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_PRICE));
+                String discount = cursor.getString(cursor.getColumnIndex(COLUMN_ORDER_DISCOUNT));
+                order = new Order(id,userPhone, productId, productName, quantity, price, discount);
+                orderList.add(order);
+            } while (cursor.moveToNext());
         }
         cursor.close();
         db.close();
-        return order;
+        return orderList;
     }
     public boolean checkUserExists(String phoneNumber) {
         SQLiteDatabase db = getReadableDatabase();

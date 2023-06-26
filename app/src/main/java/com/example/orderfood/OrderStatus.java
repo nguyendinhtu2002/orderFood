@@ -7,15 +7,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
+import com.example.orderfood.Adapter.FoodAdapter;
+import com.example.orderfood.Adapter.OrderAdapter;
 import com.example.orderfood.Common.Common;
+import com.example.orderfood.Database.MyDataBase;
+import com.example.orderfood.Interface.ItemClickListener;
+import com.example.orderfood.Model.Food;
+import com.example.orderfood.Model.Order;
 import com.example.orderfood.Model.Request;
 import com.example.orderfood.ViewHolder.OrderViewHolder;
 import com.firebase.ui.database.FirebaseRecyclerAdapter;
 import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class OrderStatus extends AppCompatActivity {
 
@@ -23,9 +32,10 @@ public class OrderStatus extends AppCompatActivity {
     public RecyclerView recyclerView;
     public RecyclerView.LayoutManager layoutManager;
     Button btnHomeBack;
-    FirebaseRecyclerAdapter<Request, OrderViewHolder> adapter;
 
-    FirebaseDatabase database;
+    MyDataBase orderDatabase=new MyDataBase(this);
+    List<Order> orderList = new ArrayList<>();
+    OrderAdapter adapter;
     DatabaseReference requests;
     @SuppressLint("MissingInflatedId")
     @Override
@@ -33,10 +43,6 @@ public class OrderStatus extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_order_status);
 
-        //Firebase
-
-        database = FirebaseDatabase.getInstance();
-        requests = database.getReference("Requests");
 
         recyclerView = findViewById(R.id.ListOrders);
         recyclerView.setHasFixedSize(true);
@@ -55,20 +61,32 @@ public class OrderStatus extends AppCompatActivity {
         });
     }
 
-    private void loadOrders(String phone) {
-        adapter = new FirebaseRecyclerAdapter<Request, OrderViewHolder>(Request.class,R.layout.order_layout,
-                OrderViewHolder.class,
-                requests.orderByChild("phone").equalTo(phone)) {
-            @Override
-            protected void populateViewHolder(OrderViewHolder viewHolder, Request model, int position) {
+//    private void loadOrders(String phone) {
+//        adapter = new FirebaseRecyclerAdapter<Request, OrderViewHolder>(Request.class,R.layout.order_layout,
+//                OrderViewHolder.class,
+//                requests.orderByChild("phone").equalTo(phone)) {
+//            @Override
+//            protected void populateViewHolder(OrderViewHolder viewHolder, Request model, int position) {
+//
+//                viewHolder.txtOrderId.setText(adapter.getRef(position).getKey());
+//                viewHolder.txtOrderName.setText(model.getName());
+//                viewHolder.txtOrderAddress.setText(model.getAddress());
+//                viewHolder.txtOrderPhone.setText(model.getPhone());
+//                viewHolder.txtOrderPrice.setText(model.getTotal());
+//            }
+//        };
+//        recyclerView.setAdapter(adapter);
+//    }
 
-                viewHolder.txtOrderId.setText(adapter.getRef(position).getKey());
-                viewHolder.txtOrderName.setText(model.getName());
-                viewHolder.txtOrderAddress.setText(model.getAddress());
-                viewHolder.txtOrderPhone.setText(model.getPhone());
-                viewHolder.txtOrderPrice.setText(model.getTotal());
-            }
-        };
+    private void loadOrders(String phone) {
+        orderList = orderDatabase.getCarts(String.valueOf(phone));
+        Log.d("LoadOrders userPhone ",phone);
+        Log.d( "loadOrders size: ",orderList.size()+"");
+        for (Order order : orderList) {
+            Log.d( "loadOrders: ",order.getProductName());
+        }
+        // Hiển thị danh sách món ăn trong RecyclerView
+        adapter = new OrderAdapter(OrderStatus.this, orderList);
         recyclerView.setAdapter(adapter);
     }
 }

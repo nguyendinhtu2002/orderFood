@@ -8,6 +8,8 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.orderfood.Interface.ItemClickListener;
+import com.example.orderfood.Model.Order;
 import com.example.orderfood.Model.Request;
 import com.example.orderfood.R;
 
@@ -18,8 +20,9 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     private List<Request> ordersList;
     private Context context;
+    private ItemClickListener itemClickListener;
 
-    public OrderAdapter(Context context) {
+    public OrderAdapter(Context context, List<Order> orderList) {
         this.context = context;
         this.ordersList = new ArrayList<>();
     }
@@ -38,17 +41,23 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        Request model = ordersList.get(position);
+        final Request order = ordersList.get(position);
 
-        holder.txtOrderName.setText(model.getName());
-        holder.txtOrderAddress.setText(model.getAddress());
-        holder.txtOrderPhone.setText(model.getPhone());
-        holder.txtOrderPrice.setText(model.getTotal());
+
+        holder.txtOrderName.setText(order.getName());
+        holder.txtOrderAddress.setText(order.getAddress());
+        holder.txtOrderPhone.setText(order.getPhone());
+        holder.txtOrderPrice.setText(order.getTotal());
     }
 
     @Override
     public int getItemCount() {
         return ordersList.size();
+    }
+
+    public void setItemClickListener(ItemClickListener itemClickListener) {
+        this.itemClickListener = itemClickListener;
+
     }
 
     public static class OrderViewHolder extends RecyclerView.ViewHolder {

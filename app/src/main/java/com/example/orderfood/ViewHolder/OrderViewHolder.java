@@ -2,14 +2,12 @@ package com.example.orderfood.ViewHolder;
 
 import android.view.View;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.orderfood.Interface.ItemClickListener;
 import com.example.orderfood.R;
-import com.example.orderfood.SignIn;
 
 public class OrderViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -19,11 +17,11 @@ public class OrderViewHolder extends RecyclerView.ViewHolder implements View.OnC
     public OrderViewHolder(@NonNull View itemView) {
         super(itemView);
 
-        txtOrderAddress = itemView.findViewById(R.id.order_address);
-        txtOrderId = itemView.findViewById(R.id.order_id);
-        txtOrderPhone = itemView.findViewById(R.id.order_phone);
-        txtOrderPrice = itemView.findViewById(R.id.order_price);
-        txtOrderName = itemView.findViewById(R.id.order_name);
+        txtOrderAddress = itemView.findViewById(R.id.txtOrderAddress);
+        txtOrderId = itemView.findViewById(R.id.txtOrderId);
+        txtOrderPhone = itemView.findViewById(R.id.txtOrderPhone);
+        txtOrderPrice = itemView.findViewById(R.id.txtOrderPrice);
+        txtOrderName = itemView.findViewById(R.id.txtOrderName);
 
         itemView.setOnClickListener(this);
     }
