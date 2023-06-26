@@ -486,7 +486,7 @@ public class MyDataBase extends SQLiteOpenHelper {
                 }
 
                 // Create a new HistoryOrder object
-                HistoryOrder historyOrder = new HistoryOrder(userPhone, deliveryAddress, creationDate,price);
+                HistoryOrder historyOrder = new HistoryOrder(userPhone, deliveryAddress, creationDate,price,"Giao hàng thành công");
 
                 // Add the HistoryOrder to the list
                 historyOrders.add(historyOrder);

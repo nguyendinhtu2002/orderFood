@@ -1,4 +1,5 @@
 package com.example.orderfood.Adapter;
+
 import android.content.Context;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,25 +10,23 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.orderfood.Interface.ItemClickListener;
-import com.example.orderfood.Model.Order;
-import com.example.orderfood.Model.Request;
+import com.example.orderfood.Model.HistoryOrder;
 import com.example.orderfood.R;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHolder> {
 
-    private List<Request> ordersList;
+    private List<HistoryOrder> ordersList;
     private Context context;
     private ItemClickListener itemClickListener;
 
-    public OrderAdapter(Context context, List<Order> orderList) {
+    public OrderAdapter(Context context, List<HistoryOrder> orderList) {
         this.context = context;
-        this.ordersList = new ArrayList<>();
+        this.ordersList = orderList;
     }
 
-    public void setOrdersList(List<Request> ordersList) {
+    public void setOrdersList(List<HistoryOrder> ordersList) {
         this.ordersList = ordersList;
         notifyDataSetChanged();
     }
@@ -41,13 +40,13 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     @Override
     public void onBindViewHolder(@NonNull OrderViewHolder holder, int position) {
-        final Request order = ordersList.get(position);
+        final HistoryOrder order = ordersList.get(position);
 
-
-        holder.txtOrderName.setText(order.getName());
-        holder.txtOrderAddress.setText(order.getAddress());
-        holder.txtOrderPhone.setText(order.getPhone());
-        holder.txtOrderPrice.setText(order.getTotal());
+        holder.txtOrderId.setText(order.getOrderId());
+        holder.txtOrderName.setText(order.getUserPhone());
+        holder.txtOrderAddress.setText(order.getDeliveryAddress());
+        holder.txtOrderPhone.setText(order.getUserPhone());
+        holder.txtOrderPrice.setText(order.getPrice());
     }
 
     @Override
@@ -57,20 +56,20 @@ public class OrderAdapter extends RecyclerView.Adapter<OrderAdapter.OrderViewHol
 
     public void setItemClickListener(ItemClickListener itemClickListener) {
         this.itemClickListener = itemClickListener;
-
     }
 
     public static class OrderViewHolder extends RecyclerView.ViewHolder {
-        public TextView txtOrderId, txtOrderName, txtOrderAddress, txtOrderPhone, txtOrderPrice;
+        public TextView txtOrderId, txtOrderName, txtOrderAddress, txtOrderPhone, txtOrderPrice, txtOrderStatus;
 
         public OrderViewHolder(View itemView) {
             super(itemView);
 
             txtOrderId = itemView.findViewById(R.id.txtOrderId);
             txtOrderName = itemView.findViewById(R.id.txtOrderName);
-            txtOrderAddress = itemView.findViewById(R.id.txtOrderAddress);
             txtOrderPhone = itemView.findViewById(R.id.txtOrderPhone);
+            txtOrderAddress = itemView.findViewById(R.id.txtOrderAddress);
             txtOrderPrice = itemView.findViewById(R.id.txtOrderPrice);
+            txtOrderStatus = itemView.findViewById(R.id.txtOrderStatus);
         }
     }
 }

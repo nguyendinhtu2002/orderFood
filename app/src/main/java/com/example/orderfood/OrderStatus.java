@@ -17,6 +17,7 @@ import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Interface.ItemClickListener;
 import com.example.orderfood.Model.Food;
+import com.example.orderfood.Model.HistoryOrder;
 import com.example.orderfood.Model.Order;
 import com.example.orderfood.Model.Request;
 import com.example.orderfood.ViewHolder.OrderViewHolder;
@@ -36,7 +37,6 @@ public class OrderStatus extends AppCompatActivity {
     MyDataBase orderDatabase=new MyDataBase(this);
     List<Order> orderList = new ArrayList<>();
     OrderAdapter adapter;
-    DatabaseReference requests;
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,7 +49,7 @@ public class OrderStatus extends AppCompatActivity {
         layoutManager = new LinearLayoutManager(this);
         recyclerView.setLayoutManager(layoutManager);
 
-        loadOrders(Common.currentUser.getPhone());
+        loadOrders();
 
         btnHomeBack = findViewById(R.id.btnHomeBack);
         btnHomeBack.setOnClickListener(new View.OnClickListener() {
@@ -78,15 +78,9 @@ public class OrderStatus extends AppCompatActivity {
 //        recyclerView.setAdapter(adapter);
 //    }
 
-    private void loadOrders(String phone) {
-        orderList = orderDatabase.getCarts(String.valueOf(phone));
-        Log.d("LoadOrders userPhone ",phone);
-        Log.d( "loadOrders size: ",orderList.size()+"");
-        for (Order order : orderList) {
-            Log.d( "loadOrders: ",order.getProductName());
-        }
-        // Hiển thị danh sách món ăn trong RecyclerView
-        adapter = new OrderAdapter(OrderStatus.this, orderList);
+    private void loadOrders() {
+        List<HistoryOrder> orders = orderDatabase.getAllHistoryOrdersByPhone("123456");
+        adapter = new OrderAdapter(this, orders);  // Pass the Context as the first argument
         recyclerView.setAdapter(adapter);
     }
 }

@@ -91,21 +91,15 @@ public class Cart extends AppCompatActivity {
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-//                    MyDataBase myDataBase = new MyDataBase();
-//
-//                    myDataBase.addHistory(
-//                            Common.currentUser.getPhone(),
-//                        Common.currentUser.getName(),
-//                        edtAddress.getText().toString(),
-//                        txtTotalPrice.getText().toString(),
-//                    );
+
 
                 myDatabase = new MyDataBase(getBaseContext());
                 HistoryOrder historyOrder = new HistoryOrder(
                         Common.currentUser.getPhone(),
                         edtAddress.getText().toString(),
                         new Date(), // Replace with the appropriate creation date
-                        txtTotalPrice.getText().toString()
+                        txtTotalPrice.getText().toString(),
+                        "Giao hàng thành công"
                 );
                 myDatabase.addHistory(historyOrder);
 

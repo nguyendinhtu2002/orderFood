@@ -1,29 +1,21 @@
 package com.example.orderfood.Model;
 
 import java.util.Date;
-import java.util.List;
 
 public class HistoryOrder {
     private String orderId;
     private String userPhone;
     private String deliveryAddress;
     private Date creationDate;
-    private String Price;
+    private String price;
+    private String status;
 
-    public HistoryOrder( String userPhone, String deliveryAddress, Date creationDate, String price) {
+    public HistoryOrder(String userPhone, String deliveryAddress, Date creationDate, String price, String status) {
         this.userPhone = userPhone;
         this.deliveryAddress = deliveryAddress;
         this.creationDate = creationDate;
-        Price = price;
-    }
-
-
-    public String getPrice() {
-        return Price;
-    }
-
-    public void setPrice(String price) {
-        Price = price;
+        this.price = price;
+        this.status = status;
     }
 
     public String getOrderId() {
@@ -37,8 +29,9 @@ public class HistoryOrder {
     public String getUserPhone() {
         return userPhone;
     }
-    public Date getCreationDate() {
-        return creationDate;
+
+    public void setUserPhone(String userPhone) {
+        this.userPhone = userPhone;
     }
 
     public String getDeliveryAddress() {
@@ -49,12 +42,27 @@ public class HistoryOrder {
         this.deliveryAddress = deliveryAddress;
     }
 
+    public Date getCreationDate() {
+        return creationDate;
+    }
+
     public void setCreationDate(Date creationDate) {
         this.creationDate = creationDate;
     }
-    public void setUserPhone(String userPhone) {
-        this.userPhone = userPhone;
+
+    public String getPrice() {
+        return price;
     }
 
+    public void setPrice(String price) {
+        this.price = price;
+    }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
 }
