@@ -79,7 +79,7 @@ public class OrderStatus extends AppCompatActivity {
 //    }
 
     private void loadOrders() {
-        List<HistoryOrder> orders = orderDatabase.getAllHistoryOrdersByPhone("123456");
+        List<HistoryOrder> orders = orderDatabase.getAllHistoryOrdersByPhone(Common.currentUser.getPhone());
         adapter = new OrderAdapter(this, orders);  // Pass the Context as the first argument
         recyclerView.setAdapter(adapter);
     }
