@@ -16,21 +16,32 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Model.HistoryOrder;
 import com.example.orderfood.Model.Order;
-import com.example.orderfood.Model.Request;
 import com.example.orderfood.ViewHolder.CartAdapter;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
+
+import java.text.DateFormat;
 import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
+import com.android.volley.Request;
 public class Cart extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
@@ -74,6 +85,7 @@ public class Cart extends AppCompatActivity {
         loadListFood();
     }
 
+
     private void showAlertDialog() {
         AlertDialog.Builder alertDialog = new AlertDialog.Builder(Cart.this);
         alertDialog.setTitle("Bước cuối cùng!");
@@ -91,21 +103,41 @@ public class Cart extends AppCompatActivity {
         alertDialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                String address = edtAddress.getText().toString();
+                String totalPrice = txtTotalPrice.getText().toString();
 
+                // Create a JSON object to hold the order data
+                JSONObject orderObject = new JSONObject();
+                try {
+                    Log.d("loi roi",Common.currentUser.toString());
+                    orderObject.put("user_phone", Common.currentUser.getPhone());
+                    orderObject.put("delivery_address", address);
+                    orderObject.put("price", totalPrice);
+                    orderObject.put("status", "Giao hàng thành công");
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+                String url = "http://10.0.2.2:8000/api/history/create";
+                JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, orderObject,
+                        new Response.Listener<JSONObject>() {
+                            @Override
+                            public void onResponse(JSONObject response) {
 
-                myDatabase = new MyDataBase(getBaseContext());
-                HistoryOrder historyOrder = new HistoryOrder(
-                        Common.currentUser.getPhone(),
-                        edtAddress.getText().toString(),
-                        new Date(), // Replace with the appropriate creation date
-                        txtTotalPrice.getText().toString(),
-                        "Giao hàng thành công"
-                );
-                myDatabase.addHistory(historyOrder);
+                                new MyDataBase(getBaseContext()).cleanCart();
+                                Toast.makeText(Cart.this, "Đặt hàng thành công", Toast.LENGTH_LONG).show();
+                                finish();
+                            }
+                        },
+                        new Response.ErrorListener() {
+                            @Override
+                            public void onErrorResponse(VolleyError error) {
+                                Toast.makeText(Cart.this, "Error" + error.getMessage(), Toast.LENGTH_SHORT).show();
 
-                new MyDataBase(getBaseContext()).cleanCart();
-                Toast.makeText(Cart.this, "Đặt hàng thành công", Toast.LENGTH_LONG).show();
-                finish();
+                            }
+                        });
+
+                // Add the request to the request queue
+                Volley.newRequestQueue(Cart.this).add(jsonObjectRequest);
             }
         });
         alertDialog.setNegativeButton("No", new DialogInterface.OnClickListener() {
@@ -116,7 +148,6 @@ public class Cart extends AppCompatActivity {
         });
         alertDialog.show();
     }
-
     private void loadListFood() {
         cart = new MyDataBase(this).getCarts(Common.currentUser.getPhone());
         adapter = new CartAdapter(cart, this);

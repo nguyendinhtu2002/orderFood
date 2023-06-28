@@ -8,27 +8,26 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
+import com.example.orderfood.Database.MyDataBase;
 
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
-import com.example.orderfood.Database.MyDataBase;
-import com.example.orderfood.Interface.MyAPIInterface;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
+import com.android.volley.toolbox.Volley;
 import com.example.orderfood.Model.User;
 
-import java.util.List;
-
-import retrofit2.Response;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.converter.gson.GsonConverterFactory;
-import okhttp3.OkHttpClient;
-
-import retrofit2.Retrofit;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class SignUp extends AppCompatActivity {
 
-    private EditText edtPhone, edtName, edtPassword,edtEmail;
+    private EditText edtPhone, edtName, edtPassword, edtEmail;
     private Button btnSignUp;
     MyDataBase myDatabase;
 
@@ -36,7 +35,6 @@ public class SignUp extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_sign_up);
-        myDatabase = new MyDataBase(this);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
@@ -46,8 +44,7 @@ public class SignUp extends AppCompatActivity {
         edtEmail = findViewById(R.id.edtEmail);
 
         btnSignUp = findViewById(R.id.btnSignUp);
-
-
+        myDatabase = new MyDataBase(this);
         btnSignUp.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -59,59 +56,44 @@ public class SignUp extends AppCompatActivity {
                 if (phone.isEmpty() || name.isEmpty() || password.isEmpty()) {
                     Toast.makeText(SignUp.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
                 } else {
-                    // Thêm người dùng mới vào SQLite
-//                    User user = new User(name, password, phone, email);
-//                    myDatabase.addUser(user);
-//                    Toast.makeText(SignUp.this, "Tạo tài khoản thành công!", Toast.LENGTH_SHORT).show();
-
-                    // Call the API to get all users
-                    getAllUsersFromAPI();
-
-                    finish();
-                }
-            }
-        });
-    }
-    private void getAllUsersFromAPI() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Đang tải danh sách người dùng...");
-        builder.setCancelable(false);
-//        AlertDialog progressDialog = builder.create();
-//        progressDialog.show();
-
-        Retrofit retrofit = new Retrofit.Builder()
-                .baseUrl("http://127.0.0.1:8000/test/")  // Thay thế URL của API thật
-                .addConverterFactory(GsonConverterFactory.create())
-                .client(new OkHttpClient.Builder().build())
-                .build();
-
-        MyAPIInterface apiInterface = retrofit.create(MyAPIInterface.class);  // Thay thế YourAPIInterface bằng interface thật
-
-        Call<List<User>> call = apiInterface.getUsers();
-        call.enqueue(new Callback <List<User>>() {
-            @Override
-            public void onResponse(Call<List<User>> call, Response <List<User>> response) {
-//                progressDialog.dismiss(); // Tắt ProgressDialog khi nhận được phản hồi từ API
-
-                if (response.isSuccessful()) {
-                    List<User> userList = response.body();
-
-                    for (User user : userList) {
-                        // Do something with each user object
-                        Log.d("User", "Name: " + user.getName() + ", Phone: " + user.getPhone());
+                    JSONObject userJson = new JSONObject();
+                    try {
+                        userJson.put("phone", phone);
+                        userJson.put("name", name);
+                        userJson.put("password", password);
+                        userJson.put("email", email);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
                     }
-                } else {
-                    Toast.makeText(SignUp.this, "Lỗi khi lấy danh sách người dùng từ API", Toast.LENGTH_SHORT).show();
-                }
-            }
 
-            @Override
-            public void onFailure(Call<List<User>> call, Throwable t) {
-//                progressDialog.dismiss(); // Tắt ProgressDialog khi gọi API thất bại
-                Log.d("Lỗi kết nối API: " ,t.getMessage());
-                Toast.makeText(SignUp.this, "Lỗi kết nối API: " + t.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    String url = "http://10.0.2.2:8000/api/user/create";
+                    JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, userJson,
+                            new Response.Listener<JSONObject>() {
+                                @Override
+                                public void onResponse(JSONObject response) {
+                                    User user = new User(name, password, phone, email);
+                                    myDatabase.addUser(user);
+                                    Toast.makeText(SignUp.this, "Tạo tài khoản thành công!", Toast.LENGTH_SHORT).show();
+
+                                    finish();
+                                }
+                            },
+                            new Response.ErrorListener() {
+                                @Override
+                                public void onErrorResponse(VolleyError error) {
+                                    Toast.makeText(SignUp.this, "Đã xảy ra lỗi khi tạo tài khoản!", Toast.LENGTH_SHORT).show();
+                                    error.printStackTrace();
+                                }
+                            });
+
+                    RequestQueue requestQueue = Volley.newRequestQueue(SignUp.this);
+                    requestQueue.add(jsonObjectRequest);
+
+                }
             }
         });
     }
+
 
 }

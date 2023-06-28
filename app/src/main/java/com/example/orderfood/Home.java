@@ -10,17 +10,15 @@ import android.view.Menu;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.orderfood.Adapter.FoodAdapter;
+import com.android.volley.Request;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.example.orderfood.Adapter.MenuAdapter;
 import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Interface.ItemClickListener;
 import com.example.orderfood.Model.Category;
-import com.example.orderfood.Model.Food;
-import com.example.orderfood.ViewHolder.MenuViewHolder;
-import com.firebase.ui.database.FirebaseRecyclerAdapter;
+import com.example.orderfood.Model.HistoryOrder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
 import androidx.annotation.NonNull;
@@ -37,16 +35,23 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.orderfood.databinding.ActivityHomeBinding;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
-import com.squareup.picasso.Picasso;
-
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
+
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class Home extends AppCompatActivity
         implements NavigationView.OnNavigationItemSelectedListener,ItemClickListener {
@@ -87,7 +92,6 @@ public class Home extends AppCompatActivity
         View headerView = navigationView.getHeaderView(0);
         txtFullName = headerView.findViewById(R.id.txtFullName);
         txtFullName.setText(Common.currentUser.getName());
-        Log.d("IdUser", Common.currentUser.getPhone());
         recycler_menu = findViewById(R.id.recycler_menu);
         recycler_menu.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -95,12 +99,12 @@ public class Home extends AppCompatActivity
 
         myDatabase = new MyDataBase(this);
         loadMenu();
+        getAllOrders(Common.currentUser.getPhone());
     }
 
-
+//
     private void loadMenu() {
         menuList = myDatabase.getAllCategories();
-
         // Create a new instance of MenuAdapter
         MenuAdapter adapter = new MenuAdapter(menuList);
 
@@ -111,35 +115,8 @@ public class Home extends AppCompatActivity
         recycler_menu.setAdapter(adapter);
     }
 
-//    private void loadMenu() {
-//        FirebaseDatabase database = FirebaseDatabase.getInstance();
-//        DatabaseReference categoryRef = database.getReference("Category");
-//
-//        // Lắng nghe sự thay đổi dữ liệu trên Firebase
-//        categoryRef.addValueEventListener(new ValueEventListener() {
-//            @Override
-//            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-//                menuList = new ArrayList<>();
-//                for (DataSnapshot categorySnapshot : dataSnapshot.getChildren()) {
-//                    Category category = categorySnapshot.getValue(Category.class);
-//                    menuList.add(category);
-//
-//                    // Insert danh sách menu vào SQLite
-//                    myDatabase.addCategory(category);
-//                }
-//
-//                // Hiển thị danh sách menu trong RecyclerView
-//                adapter = new MenuAdapter(menuList);
-//                recycler_menu.setAdapter(adapter);
-//            }
-//
-//            @Override
-//            public void onCancelled(@NonNull DatabaseError databaseError) {
-//                // Xử lý khi có lỗi xảy ra trong quá trình đọc dữ liệu từ Firebase
-//                Toast.makeText(Home.this, "Failed to load menu: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
-//            }
-//        });
-//    }
+
+
     @Override
     public void onBackPressed () {
         DrawerLayout drawer = findViewById(R.id.drawer_layout);
@@ -215,4 +192,60 @@ public class Home extends AppCompatActivity
         intent.putExtra("CategoryId", String.valueOf(clickedCategory.getCategoryId()));
         startActivity(intent);
     }
+    private void getAllOrders(String userPhone) {
+        String url = "http://10.0.2.2:8000/api/history/getbyPhone/" + userPhone;
+
+        JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,
+                new Response.Listener<JSONArray>() {
+                    @Override
+                    public void onResponse(JSONArray response) {
+                        // Process the JSON array containing the orders
+
+                        for (int i = 0; i < response.length(); i++) {
+                            try {
+                                JSONObject jsonObject = response.getJSONObject(i);
+
+                                // Extract the necessary information from the JSON object
+                                String orderId = jsonObject.getString("order_id");
+                                String phone = jsonObject.getString("user_phone");
+                                String address = jsonObject.getString("delivery_address");
+                                String date = jsonObject.getString("created_date");
+                                String totalPrice = jsonObject.getString("price");
+                                String status = jsonObject.getString("status");
+
+                                // Create a HistoryOrder object
+                                HistoryOrder historyOrder = new HistoryOrder(phone, address, convertStringToDate(date), totalPrice, status);
+
+                                myDatabase=new MyDataBase(getBaseContext());
+                                if(!myDatabase.checkOrderExists(orderId)){
+                                    myDatabase.addHistory(historyOrder);
+                                }
+
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle API error
+                    }
+                });
+
+        // Add the request to the request queue
+        Volley.newRequestQueue(this).add(jsonArrayRequest);
+    }
+    private Date convertStringToDate(String dateString) {
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+        try {
+            return format.parse(dateString);
+        } catch (ParseException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

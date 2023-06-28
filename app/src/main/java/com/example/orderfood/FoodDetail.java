@@ -12,6 +12,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.cepheuen.elegantnumberbutton.view.ElegantNumberButton;
 import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.Database;
@@ -21,6 +22,18 @@ import com.example.orderfood.Model.Order;
 import com.example.orderfood.Model.User;
 import com.google.android.material.appbar.CollapsingToolbarLayout;
 import com.squareup.picasso.Picasso;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonArrayRequest;
+import com.android.volley.toolbox.Volley;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;import com.android.volley.Request;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class FoodDetail extends AppCompatActivity {
 
@@ -107,9 +120,44 @@ public class FoodDetail extends AppCompatActivity {
                         currentFood.getPrice(),
                         currentFood.getDiscount()
                 ));
-
+            createOrderOnServer(quantity);
             Toast.makeText(FoodDetail.this, "Thêm vào giỏ hàng", Toast.LENGTH_SHORT).show();
             finish();
         }
+    }
+    private void createOrderOnServer(String quantity) {
+        String url = "http://10.0.2.2:8000/api/order/create";
+
+        JSONObject requestData = new JSONObject();
+        try {
+            requestData.put("user_phone", Common.currentUser.getPhone());
+            requestData.put("food_id", foodId);
+            requestData.put("food_name", currentFood.getName());
+            requestData.put("quantity", quantity);
+            requestData.put("discount", currentFood.getDiscount());
+            requestData.put("Price", currentFood.getPrice());
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, requestData,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject response) {
+                        // Handle the successful response
+                        // Order created successfully on the server
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        // Handle API error
+                        Toast.makeText(FoodDetail.this, "Failed to push order to  server: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+
+                    }
+                });
+
+        // Add the request to the request queue
+        Volley.newRequestQueue(this).add(jsonObjectRequest);
     }
 }

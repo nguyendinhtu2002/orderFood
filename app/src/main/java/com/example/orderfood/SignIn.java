@@ -52,7 +52,7 @@ public class SignIn extends AppCompatActivity {
                     return;
                 }
                     if (myDatabase.checkUserCredentials(phone, password)) {
-                        User user = new User(phone, "", password,""); // You can modify this line to retrieve user information from the database if needed
+                        User user = new User("", password, phone,""); // You can modify this line to retrieve user information from the database if needed
                         Intent homeIntent = new Intent(SignIn.this, Home.class);
                         Common.currentUser = user;
                         startActivity(homeIntent);

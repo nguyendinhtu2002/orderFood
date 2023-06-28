@@ -143,6 +143,7 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.insert(TABLE_USERS, null, values);
         db.close();
     }
+
     public void addCategory(Category category) {
         SQLiteDatabase db = getWritableDatabase();
         ContentValues values = new ContentValues();
@@ -212,6 +213,15 @@ public class MyDataBase extends SQLiteOpenHelper {
         return categoryList;
     }
 
+    public boolean isCategoryExists(Category category) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_CATEGORY + " WHERE " + COLUMN_CATEGORY_NAME + " = ?";
+        String[] selectionArgs = {category.getName()};
+        Cursor cursor = db.rawQuery(query, selectionArgs);
+        boolean exists = cursor.moveToFirst();
+        cursor.close();
+        return exists;
+    }
 
 
     public List<Order> getCarts(String phone) {
@@ -234,7 +244,23 @@ public class MyDataBase extends SQLiteOpenHelper {
         }
         return orderList;
     }
+    public boolean isFoodExists(Food food) {
+        SQLiteDatabase db = this.getReadableDatabase();
+        Cursor cursor = null;
+        try {
+            String query = "SELECT * FROM " + TABLE_FOODS +
+                    " WHERE " + COL_ID + " = ?";
 
+            cursor = db.rawQuery(query, new String[]{String.valueOf(food.getId())});
+
+            return cursor != null && cursor.moveToFirst();
+        } finally {
+            if (cursor != null) {
+                cursor.close();
+            }
+            db.close();
+        }
+    }
     public boolean checkFoodExist(String phoneNumber, String food_id) {
         SQLiteDatabase db = getReadableDatabase();
         String[] columns = {COLUMN_ORDER_USER_PHONE, COLUMN_ORDER_PRODUCT_ID};
@@ -497,5 +523,14 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.close();
 
         return historyOrders;
+    }
+    public boolean checkOrderExists(String orderId) {
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT * FROM " + TABLE_HISTORY_ORDER + " WHERE " + COLUMN_HISTORY_ID + " = ?";
+        Cursor cursor = db.rawQuery(query, new String[]{orderId});
+        boolean exists = cursor.getCount() > 0;
+        cursor.close();
+        db.close();
+        return exists;
     }
 }
