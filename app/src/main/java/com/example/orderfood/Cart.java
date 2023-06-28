@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,29 +15,23 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.android.volley.toolbox.JsonArrayRequest;
+
 import com.android.volley.toolbox.JsonObjectRequest;
+import com.example.orderfood.Adapter.CartAdapter;
+
 import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.MyDataBase;
-import com.example.orderfood.Model.HistoryOrder;
 import com.example.orderfood.Model.Order;
-import com.example.orderfood.ViewHolder.CartAdapter;
 
-
-import java.text.DateFormat;
 import java.text.NumberFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 
-import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 import com.android.volley.Request;
@@ -46,6 +39,7 @@ public class Cart extends AppCompatActivity {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     MyDataBase myDatabase;
+
 
     TextView txtTotalPrice;
     Button btnPlace, btnCartBack;
@@ -57,7 +51,6 @@ public class Cart extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
-
 
 
         recyclerView = findViewById(R.id.listCart);
@@ -109,7 +102,6 @@ public class Cart extends AppCompatActivity {
                 // Create a JSON object to hold the order data
                 JSONObject orderObject = new JSONObject();
                 try {
-                    Log.d("loi roi",Common.currentUser.toString());
                     orderObject.put("user_phone", Common.currentUser.getPhone());
                     orderObject.put("delivery_address", address);
                     orderObject.put("price", totalPrice);
@@ -152,6 +144,12 @@ public class Cart extends AppCompatActivity {
         cart = new MyDataBase(this).getCarts(Common.currentUser.getPhone());
         adapter = new CartAdapter(cart, this);
         recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
+
+        // Tạo đối tượng CartAdapter và gán giá trị cho txtTotalPrice
+        CartAdapter adapter = new CartAdapter(cart, this);
+        adapter.setTxtTotalPrice(txtTotalPrice);
+
         //calc total
         int total = 0;
         for(Order order:cart){
@@ -162,4 +160,6 @@ public class Cart extends AppCompatActivity {
 
         txtTotalPrice.setText(fmt.format(total));
     }
+
+
 }

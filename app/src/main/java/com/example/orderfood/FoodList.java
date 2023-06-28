@@ -57,7 +57,9 @@ public class FoodList extends AppCompatActivity {
         if (getIntent() != null) {
             categoryId = getIntent().getStringExtra("CategoryId");
             if (categoryId != null) {
+
                 loadFoodListFromServer(categoryId);
+
             } else {
                 Toast.makeText(this, "CategoryId is null", Toast.LENGTH_SHORT).show();
             }

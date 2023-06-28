@@ -55,7 +55,14 @@ public class SignUp extends AppCompatActivity {
 
                 if (phone.isEmpty() || name.isEmpty() || password.isEmpty()) {
                     Toast.makeText(SignUp.this, "Vui lòng nhập đầy đủ thông tin", Toast.LENGTH_SHORT).show();
-                } else {
+                } else if (!isValidPhone(phone)) {
+                    Toast.makeText(SignUp.this, "Số điện thoại không hợp lệ", Toast.LENGTH_SHORT).show();
+                } else if (!isValidEmail(email)) {
+                    Toast.makeText(SignUp.this, "Email không hợp lệ", Toast.LENGTH_SHORT).show();
+                }else if(password.length()!=8){
+                    Toast.makeText(SignUp.this, "Password không hợp lệ", Toast.LENGTH_SHORT).show();
+                }
+                else  {
                     JSONObject userJson = new JSONObject();
                     try {
                         userJson.put("phone", phone);
@@ -65,7 +72,6 @@ public class SignUp extends AppCompatActivity {
                     } catch (JSONException e) {
                         e.printStackTrace();
                     }
-
 
                     String url = "http://10.0.2.2:8000/api/user/create";
                     JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.POST, url, userJson,
@@ -94,6 +100,11 @@ public class SignUp extends AppCompatActivity {
             }
         });
     }
-
+    private boolean isValidPhone(String phone) {
+        return phone.length() == 10;
+    }
+    private boolean isValidEmail(String email) {
+        return email.endsWith("@gmail.com");
+    }
 
 }

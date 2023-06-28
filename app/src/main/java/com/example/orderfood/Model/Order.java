@@ -8,11 +8,12 @@ public class Order {
     private String Quantity;
     private String Price;
     private String Discount;
-
     public Order() {
     }
 
-    public Order(String id,String userPhone, String productId, String productName, String quantity, String price, String discount) {
+
+
+    public Order(String id, String userPhone, String productId, String productName, String quantity, String price, String discount) {
         Id=id;
         UserPhone=userPhone;
         ProductId = productId;
@@ -20,6 +21,7 @@ public class Order {
         Quantity = quantity;
         Price = price;
         Discount = discount;
+
     }
 
     public Order(String userPhone,String productId, String productName, String quantity, String price, String discount) {

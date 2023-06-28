@@ -380,6 +380,25 @@ public class MyDataBase extends SQLiteOpenHelper {
         db.close();
         return userList;
     }
+    public User getUserByPhone(String phone) {
+        SQLiteDatabase db = getReadableDatabase();
+        String selectQuery = "SELECT * FROM " + TABLE_USERS + " WHERE " + COL_Phone + " = ?";
+        Cursor cursor = db.rawQuery(selectQuery, new String[]{phone});
+
+        User user = null;
+        if (cursor.moveToFirst()) {
+            String name = cursor.getString(cursor.getColumnIndex(COL_Name));
+            String password = cursor.getString(cursor.getColumnIndex(COL_PASSWORD));
+            String email = cursor.getString(cursor.getColumnIndex(COL_EMAIL));
+            user = new User(name, password, phone, email);
+        }
+
+        cursor.close();
+        db.close();
+
+        return user;
+    }
+
     public void insertFood(Food food) {
 
         SQLiteDatabase db = getWritableDatabase();
@@ -470,6 +489,15 @@ public class MyDataBase extends SQLiteOpenHelper {
         String query = String.format("DELETE FROM " + TABLE_ORDER);
         db.execSQL(query);
     }
+    public void deleteItemOnOrder(String orderId) {
+        SQLiteDatabase db = getWritableDatabase();
+        String whereClause = COLUMN_ORDER_ID + " = ?";
+        String[] whereArgs = {orderId};
+        db.delete(TABLE_ORDER, whereClause, whereArgs);
+        db.close();
+    }
+
+
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return sdf.format(date);

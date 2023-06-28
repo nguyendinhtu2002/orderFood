@@ -91,7 +91,8 @@ public class Home extends AppCompatActivity
 
         View headerView = navigationView.getHeaderView(0);
         txtFullName = headerView.findViewById(R.id.txtFullName);
-        txtFullName.setText(Common.currentUser.getName());
+
+        txtFullName.setText(Common.currentUser.getPhone());
         recycler_menu = findViewById(R.id.recycler_menu);
         recycler_menu.setHasFixedSize(true);
         layoutManager = new LinearLayoutManager(this);
@@ -220,7 +221,6 @@ public class Home extends AppCompatActivity
                                 if(!myDatabase.checkOrderExists(orderId)){
                                     myDatabase.addHistory(historyOrder);
                                 }
-
                             } catch (JSONException e) {
                                 e.printStackTrace();
                             }
