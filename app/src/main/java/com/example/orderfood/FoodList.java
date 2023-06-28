@@ -61,6 +61,7 @@ public class FoodList extends AppCompatActivity {
                 categoryId = "0" + categoryId;
                 Log.d("CategoryId", categoryId);
                 loadFoodListFromSQLite(categoryId);
+                //loadFoodListFromFirebase(categoryId);
             } else {
                 Toast.makeText(this, "CategoryId is null", Toast.LENGTH_SHORT).show();
             }

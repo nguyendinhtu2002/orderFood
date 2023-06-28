@@ -8,7 +8,6 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,14 +15,11 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.orderfood.Adapter.CartAdapter;
 import com.example.orderfood.Common.Common;
 import com.example.orderfood.Database.MyDataBase;
 import com.example.orderfood.Model.HistoryOrder;
 import com.example.orderfood.Model.Order;
-import com.example.orderfood.Model.Request;
-import com.example.orderfood.ViewHolder.CartAdapter;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 
 import java.text.NumberFormat;
 import java.util.ArrayList;
@@ -31,10 +27,11 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
-public class Cart extends AppCompatActivity {
+public class Cart extends AppCompatActivity  {
     RecyclerView recyclerView;
     RecyclerView.LayoutManager layoutManager;
     MyDataBase myDatabase;
+
 
     TextView txtTotalPrice;
     Button btnPlace, btnCartBack;
@@ -46,7 +43,6 @@ public class Cart extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_cart);
-
 
 
         recyclerView = findViewById(R.id.listCart);
@@ -121,6 +117,12 @@ public class Cart extends AppCompatActivity {
         cart = new MyDataBase(this).getCarts(Common.currentUser.getPhone());
         adapter = new CartAdapter(cart, this);
         recyclerView.setAdapter(adapter);
+        recyclerView.setAdapter(adapter);
+
+        // Tạo đối tượng CartAdapter và gán giá trị cho txtTotalPrice
+        CartAdapter adapter = new CartAdapter(cart, this);
+        adapter.setTxtTotalPrice(txtTotalPrice);
+
         //calc total
         int total = 0;
         for(Order order:cart){
@@ -131,4 +133,6 @@ public class Cart extends AppCompatActivity {
 
         txtTotalPrice.setText(fmt.format(total));
     }
+
+
 }

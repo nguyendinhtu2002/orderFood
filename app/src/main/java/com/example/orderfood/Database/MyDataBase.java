@@ -444,6 +444,15 @@ public class MyDataBase extends SQLiteOpenHelper {
         String query = String.format("DELETE FROM " + TABLE_ORDER);
         db.execSQL(query);
     }
+    public void deleteItemOnOrder(String orderId) {
+        SQLiteDatabase db = getWritableDatabase();
+        String whereClause = COLUMN_ORDER_ID + " = ?";
+        String[] whereArgs = {orderId};
+        db.delete(TABLE_ORDER, whereClause, whereArgs);
+        db.close();
+    }
+
+
     private String formatDate(Date date) {
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
         return sdf.format(date);
